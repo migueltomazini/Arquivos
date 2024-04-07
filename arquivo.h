@@ -11,5 +11,7 @@ e um arquivo binário como saída*/
 
     typedef struct cabecalho_ CABECALHO;
     typedef struct registro_ REGISTRO;
+
+    FILE *inserirDados(char *nomeArquivoCsv);
     
 #endif

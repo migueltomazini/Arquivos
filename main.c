@@ -10,3 +10,11 @@ Isabela Beatriz Sousa Nunes Farias - 13823833
 Miguel Rodrigues Tomazini - 14599300
 (2024)
 */
+
+#include "arquivo.h"
+#include "funcoes_fornecidas.h"
+
+int main() {
+    inserirDados("dado1.csv");
+    binarioNaTela("arquivo.bin");
+}
