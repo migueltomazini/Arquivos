@@ -10,7 +10,7 @@ struct cabecalho_ {
 
 struct registro_ {
     char removido;
-    int tamanhoRegistro;
+    int tamanhoRegistro;//oi
     long int prox;
     int id;
     int idade;
