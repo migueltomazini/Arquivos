@@ -12,6 +12,30 @@ e um arquivo binário como saída*/
     typedef struct cabecalho_ CABECALHO;
     typedef struct registro_ REGISTRO;
 
-    FILE *inserirDados(char *nomeArquivoCsv);
+    struct cabecalho_ {
+        char status;
+        long int topo;
+        long int prosByteOffset;
+        int nroRegArq;
+        int nroRegRem;
+    };
+
+    struct registro_ {
+        char removido;              // '0' não removido / '1' removido
+        int tamanhoRegistro;
+        long int prox;
+        int id;
+        int idade;
+        int tamNomeJog;
+        char *nomeJogador;
+        int tamNacionalidade;
+        char *nacionalidade;
+        int tamNomeClube;
+        char *nomeClube;
+    };
+
+
+    void inserirDados(char *nomeArquivoCsv);
+    void inserirRegistro(REGISTRO *registro, FILE *arquivo);
     
 #endif
