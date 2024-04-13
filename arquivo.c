@@ -1,7 +1,7 @@
 #include "arquivo.h"
 
 // Função responsável pela montagem e inserção do cabeçalho
-void cabecalho(FILE *arquivo) {
+void cabecalho(FILE *arquivo, int nroRegArq) {
     CABECALHO *cabecalho = malloc(sizeof(CABECALHO));
     int tamCabecalho = sizeof(char) + 2 * sizeof(int) + 2 * sizeof(long int);
 
@@ -11,7 +11,7 @@ void cabecalho(FILE *arquivo) {
     cabecalho->status = '1';
     cabecalho->topo = -1;
     cabecalho->prosByteOffset = 0;
-    cabecalho->nroRegArq = 0;
+    cabecalho->nroRegArq = nroRegArq;
     cabecalho->nroRegRem = 0;
 
     putc(cabecalho->status, arquivo);
@@ -19,8 +19,6 @@ void cabecalho(FILE *arquivo) {
     fwrite(&cabecalho->prosByteOffset, sizeof(long int), 1, arquivo);
     fwrite(&cabecalho->nroRegArq, sizeof(int), 1, arquivo);
     fwrite(&cabecalho->nroRegRem, sizeof(int), 1, arquivo);
-
-    //fwrite(cabecalho, tamCabecalho, 1, arquivo);
 
     free(cabecalho);
 }
@@ -34,7 +32,7 @@ void alocarRegistro(REGISTRO **registro) {
     (*registro)->nomeJogador = malloc(30 * sizeof(char));
     (*registro)->nomeClube = malloc(30 * sizeof(char));
     (*registro)->nacionalidade = malloc(30 * sizeof(char));
-    if ((*registro)->nomeJogador == NULL || (*registro)->nomeClube == NULL|| 
+    if ((*registro)->nomeJogador == NULL || (*registro)->nomeClube == NULL || 
         (*registro)->nacionalidade == NULL)
         exit(1);
 }
@@ -45,46 +43,75 @@ void desalocarRegistro(REGISTRO **registro) {
     free((*registro)->nacionalidade);
     free((*registro)->nomeClube);
     free((*registro));
-    registro = NULL;
+    *registro = NULL;
 }
 
 // Função responsável pela montagem e inserção dos registros
-void criarRegistro(FILE *dados, FILE *arquivo) {
-    printf("a");
-    char c = '\0';
+void criarRegistro(FILE *dados, FILE *arquivo) {        // Mudar nome apenas para Registro
+    char c = '\0';                                      // Criar nova função apenas para coletar os dados
     REGISTRO *registro;
+
+    int i = 0;
+    int regAdicionados = 0;
+    char charId[8];
+    char charIdade[4];
+
     alocarRegistro(&registro);
 
     // Coleta os dados enquanto não chegar ao final do arquivo csv (origem)
     while ((c = getc(dados)) != EOF) { 
         ungetc(c, dados);
 
+        registro->prox = -1;
+
+        for (i = 0; (c = getc(dados)) != ','; i++)      // Id
+            charId[i] = c;
+        charId[i++] = '\0';
+        registro->id = atoi(charId);
+
+        for (i = 0; (c = getc(dados)) != ','; i++)      // Idade
+            charIdade[i] = c;
+        charIdade[i++] = '\0';
+        if (i == 1)    
+            registro->idade = -1;   // Se não houver idade registrada, marcar como -1
+        else
+            registro->idade = atoi(charIdade);
+
         registro->removido = '0';
-        fread(&registro->id, sizeof(int), 1, arquivo);
-        getc(dados);
-        fread(&registro->idade, sizeof(int), 1, arquivo);
-        for (int i = 0; (c = getc(dados)) != ','; i++) {
+
+        for (i = 0; (c = getc(dados)) != ','; i++)      // Nome e tamanho Jogador
             registro->nomeJogador[i] = c;
-            registro->tamNomeJog = i + 1;
-        }
-        for (int i = 0; (c = getc(dados)) != ','; i++) {
+        registro->nomeJogador[i] = '\0';
+        registro->tamNomeJog = i;
+        
+        for (i = 0; (c = getc(dados)) != ','; i++)      // Nome e tamanho nacionalidade
             registro->nacionalidade[i] = c;
-            registro->tamNacionalidade = i + 1;
-        }
-        for (int i = 0; (c = getc(dados)) != ','; i++) {
+        registro->nacionalidade[i] = '\0';
+        registro->tamNacionalidade = i;
+        
+        for (i = 0; (c = getc(dados)) != '\n'; i++)     // Nome e tamanho Clube
             registro->nomeClube[i] = c;
-            registro->tamNomeClube = i + 1;
-        }
-        registro->tamanhoRegistro = (sizeof(REGISTRO) - 3 * sizeof(char *) +
+            registro->nomeClube[i] = '\0';
+        registro->tamNomeClube = i;
+        
+        registro->tamanhoRegistro = (sizeof(char) + 6 * sizeof(int) + sizeof(long int) +
             registro->tamNomeJog + registro->tamNomeClube + registro->tamNacionalidade);
 
         inserirRegistro(registro, arquivo);
+        regAdicionados++;
     }
+    // Atualizar cabeçalho
+    fseek(arquivo, 17, SEEK_SET);
+    fwrite(&regAdicionados, sizeof(int), 1, arquivo);
+
     desalocarRegistro(&registro);
 }
 
 // Função responsável por inserir o registro no arquivo bin (destino)
 void inserirRegistro(REGISTRO *registro, FILE *arquivo) {
+    if (registro == NULL || arquivo == NULL)
+        return;
+
     putc(registro->removido, arquivo);
     fwrite(&registro->tamanhoRegistro, sizeof(int), 1, arquivo);
     fwrite(&registro->prox, sizeof(long int), 1, arquivo);
@@ -99,20 +126,20 @@ void inserirRegistro(REGISTRO *registro, FILE *arquivo) {
 }
 
 // Função responsável por passar os dados do arquivo .csv para o binário
-void inserirDados(char *nomeArquivoCsv) {
+void csvTozBin(char *nomeArquivoCsv, char *nomeArquivoBin) {
     FILE *arquivo;      // Arquivo binário para qual serão passados os dados
     FILE *dados;        // Arquivo .csv contendo os dados
-    
+
     // Abertura e testagem dos arquivos 
     if ((dados = fopen(nomeArquivoCsv, "r")) == NULL ||
-        (arquivo = fopen("arquivo.bin", "ab")) == NULL) {
+        (arquivo = fopen(nomeArquivoBin, "wb")) == NULL) { // Abrir arquivo no modo escrita
         printf("Erro na abertura do arquivo.\n");
         return;
     }
 
     // Pular primeira linha
     while ((fgetc(dados)) != '\n') {}
-    cabecalho(arquivo);
+    cabecalho(arquivo, 0);
     criarRegistro(dados, arquivo);
 
     fclose(arquivo);

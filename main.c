@@ -15,6 +15,19 @@ Miguel Rodrigues Tomazini - 14599300
 #include "funcoes_fornecidas.h"
 
 int main() {
-    inserirDados("dado1.csv");
-    binarioNaTela("arquivo.bin");
+    int comando = -1;
+    char nomeArquivoCsv[50];
+    char nomeArquivoBin[50];
+
+    scanf("%d", &comando);
+
+    switch (comando) {
+    case 1:
+        scanf(" %s", nomeArquivoCsv);
+        scanf(" %s", nomeArquivoBin);
+        csvToBin(nomeArquivoCsv, nomeArquivoBin);
+        break;
+    default:
+        break;
+    }
 }

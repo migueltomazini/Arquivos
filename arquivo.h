@@ -35,7 +35,7 @@ e um arquivo binário como saída*/
     };
 
 
-    void inserirDados(char *nomeArquivoCsv);
+    void csvToBin(char *nomeArquivoCsv, char *nomeArquivoBin);
     void inserirRegistro(REGISTRO *registro, FILE *arquivo);
     
 #endif
