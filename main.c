@@ -11,11 +11,11 @@ Miguel Rodrigues Tomazini - 14599300
 (2024)
 */
 
-#include "arquivo.h"
-#include "funcoes_fornecidas.h"
+#include "funcoes.h"
 
 int main() {
     int comando = -1;
+    int nroBuscas;
     char nomeArquivoCsv[50];
     char nomeArquivoBin[50];
 
@@ -25,8 +25,17 @@ int main() {
     case 1:
         scanf(" %s", nomeArquivoCsv);
         scanf(" %s", nomeArquivoBin);
-        csvToBin(nomeArquivoCsv, nomeArquivoBin);
+        createTable(nomeArquivoCsv, nomeArquivoBin);
+        binarioNaTela(nomeArquivoBin);
         break;
+    case 2:
+        scanf (" %s", nomeArquivoBin);
+        selectFrom(nomeArquivoBin);
+        break;
+    case 3:
+        scanf(" %s", nomeArquivoBin);
+        scanf("%d", &nroBuscas);
+        selectFromWhere(nomeArquivoBin, nroBuscas);
     default:
         break;
     }

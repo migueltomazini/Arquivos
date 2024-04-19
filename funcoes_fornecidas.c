@@ -1,4 +1,4 @@
-#include "funcoes_fornecidas.h"
+#include "funcoes.h"
 
 void binarioNaTela(char *nomeArquivoBinario) { /* Você não precisa entender o código dessa função. */
 
