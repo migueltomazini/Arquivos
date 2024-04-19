@@ -3,7 +3,6 @@
 // Função responsável pela montagem e inserção do cabeçalho
 void cabecalho(FILE *arquivo, int nroRegArq) {
     CABECALHO *cabecalho = malloc(sizeof(CABECALHO));
-    int tamCabecalho = sizeof(char) + 2 * sizeof(int) + 2 * sizeof(long int);
 
     if (cabecalho == NULL)
         return;
@@ -29,9 +28,9 @@ void alocarRegistro(REGISTRO **registro) {
     if (*registro == NULL) 
         exit(1);
 
-    (*registro)->nomeJogador = malloc(30 * sizeof(char));
-    (*registro)->nomeClube = malloc(30 * sizeof(char));
-    (*registro)->nacionalidade = malloc(30 * sizeof(char));
+    (*registro)->nomeJogador = malloc(35 * sizeof(char));
+    (*registro)->nomeClube = malloc(35 * sizeof(char));
+    (*registro)->nacionalidade = malloc(35 * sizeof(char));
     if ((*registro)->nomeJogador == NULL || (*registro)->nomeClube == NULL || 
         (*registro)->nacionalidade == NULL)
         exit(1);
@@ -92,7 +91,7 @@ void criarRegistro(FILE *dados, FILE *arquivo) {        // Mudar nome apenas par
         
         for (i = 0; (c = getc(dados)) != '\n'; i++)     // Nome e tamanho Clube
             registro->nomeClube[i] = c;
-            registro->nomeClube[i] = '\0';
+        registro->nomeClube[i] = '\0';
         registro->tamNomeClube = i;
         
         registro->tamanhoRegistro = (sizeof(char) + 6 * sizeof(int) + sizeof(long int) +

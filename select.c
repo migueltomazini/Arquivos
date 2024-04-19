@@ -4,8 +4,6 @@
 void recuperarRegistro(REGISTRO **registro, FILE *arquivo) {
     REGISTRO *reg = *registro;
     int i = 0;
-    char teste[30];
-    char c;
 
     fread(&reg->removido, sizeof(char), 1, arquivo);
     fread(&reg->tamanhoRegistro, sizeof(int), 1, arquivo);
@@ -76,9 +74,6 @@ int comandoBusca(int *nroComandos, char (*comando)[5][10], char (*palavraChave)[
             strcpy((*palavraChave)[j], temp);
             c = getchar();
         }
-
-        //printf("%s\n", (*comando)[j]);
-        //printf("%s\n", (*palavraChave)[j]);
     }
     return j;
 }
@@ -89,16 +84,10 @@ int comandoBusca(int *nroComandos, char (*comando)[5][10], char (*palavraChave)[
             2 - Registro possui os atributos buscados e busca deve ser interrompida (comando = "id")
             3 - Registro não possui os atributos buscados e busca deve ser interrompida (comando = "id")*/
 int busca(REGISTRO *registro, int nroComandos, char comando[5][10], char palavraChave[5][30]) { // acertar tamanho
-    char c;
     int temp;
     int retorno = 1;
-    //printf("%s\n", comando[0]);
-    //printf("%s\n", palavraChave[0]);
 
     for (int i = 0; i < nroComandos; i++) {
-        //printf("%s\n", comando[i]);
-        //printf("%s\n", palavraChave[i]);
-        //printf("%d\n", atoi(palavraChave[i]));
         if (strcmp(comando[i], "id") == 0) {
             temp = atoi(palavraChave[i]);
             if (temp != registro->id)
@@ -124,24 +113,23 @@ int busca(REGISTRO *registro, int nroComandos, char comando[5][10], char palavra
         }   
     }
 
-
     return (retorno - 1);        // O registro possui os atributos buscados se o retorno for 0 ou 2
 }
 
 void impressaoRegistro(REGISTRO *registro) {
     if (registro->removido == '0') { // Verifica se o registro não foi removido  
             if (registro->tamNomeJog != 0)
-                printf("Nome do jogador: %s\n", registro->nomeJogador);
+                printf("Nome do Jogador: %s\n", registro->nomeJogador);
             else
-                printf("Nome do jogador: SEM DADO\n");
+                printf("Nome do Jogador: SEM DADO\n");
             if (registro->tamNacionalidade != 0)
                 printf("Nacionalidade do Jogador: %s\n", registro->nacionalidade);
             else
                 printf("Nacionalidade do Jogador: SEM DADO\n");
             if (registro->tamNomeClube != 0)
-                printf("Clube do jogador: %s\n", registro->nomeClube);
+                printf("Clube do Jogador: %s\n", registro->nomeClube);
             else
-                printf("Clube do jogador: SEM DADO\n");
+                printf("Clube do Jogador: SEM DADO\n");
             printf("\n");
         }
 }
@@ -205,11 +193,11 @@ void selectFromWhere(char *nomeArquivo, int nroBuscas) {
     }
 
     for (int j = 1; j <= nroBuscas; j++) {
-        printf("Busca %d\n\n", j);
         nroRegistros = 0;
 
         fseek(arquivo, TAM_CABECALHO, SEEK_SET);    // Voltar ao início desconsiderando cabeçalho
         nroComandos = comandoBusca(&nroComandos, &comando, &palavraChave);
+        printf("Busca %d\n\n", j);
         while ((c = getc(arquivo)) != EOF) {
             ungetc(c, arquivo);
 
@@ -230,7 +218,6 @@ void selectFromWhere(char *nomeArquivo, int nroBuscas) {
         if (nroRegistros == 0)      // Se uma determinada busca não retornar registros
             printf("Registro inexistente.\n\n");
     }
-    printf("\n");
 
     desalocarRegistro(&registro);
     fclose(arquivo);
