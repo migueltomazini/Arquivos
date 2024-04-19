@@ -131,17 +131,17 @@ int busca(REGISTRO *registro, int nroComandos, char comando[5][10], char palavra
 void impressaoRegistro(REGISTRO *registro) {
     if (registro->removido == '0') { // Verifica se o registro não foi removido  
             if (registro->tamNomeJog != 0)
-                printf("Nome do jogador: %s\n", registro->nomeJogador);
+                printf("Nome do Jogador: %s\n", registro->nomeJogador);
             else
-                printf("Nome do jogador: SEM DADO\n");
+                printf("Nome do Jogador: SEM DADO\n");
             if (registro->tamNacionalidade != 0)
                 printf("Nacionalidade do Jogador: %s\n", registro->nacionalidade);
             else
                 printf("Nacionalidade do Jogador: SEM DADO\n");
             if (registro->tamNomeClube != 0)
-                printf("Clube do jogador: %s\n", registro->nomeClube);
+                printf("Clube do Jogador: %s\n", registro->nomeClube);
             else
-                printf("Clube do jogador: SEM DADO\n");
+                printf("Clube do Jogador: SEM DADO\n");
             printf("\n");
         }
 }
