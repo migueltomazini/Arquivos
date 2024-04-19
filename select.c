@@ -233,4 +233,5 @@ void selectFromWhere(char *nomeArquivo, int nroBuscas) {
     printf("\n");
 
     desalocarRegistro(&registro);
+    fclose(arquivo);
 }
