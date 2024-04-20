@@ -23,14 +23,14 @@ void cabecalho(FILE *arquivo, int nroRegArq) {
 }
 
 // Função auxiliar responsável por alocar memória dinamicamente para o registro
-void alocarRegistro(REGISTRO **registro) {
+void alocarRegistro(REGISTRO **registro, int maxNomeJog, int maxNacionalidade, int maxNomeClube) {
     *registro = malloc(sizeof(REGISTRO));
     if (*registro == NULL) 
         exit(1);
 
-    (*registro)->nomeJogador = malloc(35 * sizeof(char));
-    (*registro)->nomeClube = malloc(35 * sizeof(char));
-    (*registro)->nacionalidade = malloc(35 * sizeof(char));
+    (*registro)->nomeJogador = malloc(maxNomeJog * sizeof(char));
+    (*registro)->nomeClube = malloc(maxNacionalidade * sizeof(char));
+    (*registro)->nacionalidade = malloc(maxNomeClube * sizeof(char));
     if ((*registro)->nomeJogador == NULL || (*registro)->nomeClube == NULL || 
         (*registro)->nacionalidade == NULL)
         exit(1);
@@ -53,10 +53,15 @@ void criarRegistro(FILE *dados, FILE *arquivo) {        // Mudar nome apenas par
     int i = 0;
     int regAdicionados = 0;
     long int proxByteOffset = TAM_CABECALHO;
-    char charId[8];
-    char charIdade[4];
 
-    alocarRegistro(&registro);
+    int maxNomeJog = 30;
+    int maxNacionalidade = 30;
+    int maxNomeClube = 30;
+
+    char charId[8];         // Utilizado para ler o ID em dados
+    char charIdade[4];      // Utilizado para ler a idade em dados
+
+    alocarRegistro(&registro, maxNomeJog, maxNacionalidade, maxNomeClube);
 
     // Coleta os dados enquanto não chegar ao final do arquivo csv (origem)
     while ((c = getc(dados)) != EOF) { 
@@ -79,18 +84,36 @@ void criarRegistro(FILE *dados, FILE *arquivo) {        // Mudar nome apenas par
 
         registro->removido = '0';
 
-        for (i = 0; (c = getc(dados)) != ','; i++)      // Nome e tamanho Jogador
+        for (i = 0; (c = getc(dados)) != ','; i++) {    // Nome e tamanho Jogador
+            if (i == maxNomeJog - 1) {
+                maxNomeJog += 5;
+                registro->nomeJogador = realloc(registro->nomeJogador, maxNomeJog * sizeof(char));
+                if (registro->nomeJogador == NULL) exit(1);
+            }
             registro->nomeJogador[i] = c;
+        }
         registro->nomeJogador[i] = '\0';
         registro->tamNomeJog = i;
         
-        for (i = 0; (c = getc(dados)) != ','; i++)      // Nome e tamanho nacionalidade
+        for (i = 0; (c = getc(dados)) != ','; i++) {    // Nome e tamanho nacionalidade
+            if (i == maxNacionalidade - 1) {
+                maxNacionalidade += 5;
+                registro->nacionalidade = realloc(registro->nacionalidade, maxNacionalidade * sizeof(char));
+                if (registro->nacionalidade == NULL) exit(1);
+            }
             registro->nacionalidade[i] = c;
+        }
         registro->nacionalidade[i] = '\0';
         registro->tamNacionalidade = i;
         
-        for (i = 0; (c = getc(dados)) != '\n'; i++)     // Nome e tamanho Clube
+        for (i = 0; (c = getc(dados)) != '\n'; i++) {   // Nome e tamanho Clube
+            if (i == maxNomeClube - 1) {
+                maxNomeClube += 5;
+                registro->nomeClube = realloc(registro->nomeClube, maxNomeClube * sizeof(char));
+                if (registro->nomeClube == NULL) exit(1);
+            }
             registro->nomeClube[i] = c;
+        }
         registro->nomeClube[i] = '\0';
         registro->tamNomeClube = i;
         

@@ -1,7 +1,7 @@
 #include "funcoes.h"
 
 // Função auxiliar para auxiliar a recuperar um registro
-void recuperarRegistro(REGISTRO **registro, FILE *arquivo) {
+void recuperarRegistro(REGISTRO **registro, FILE *arquivo, int *maxNomeJog, int *maxNacionalidade, int *maxNomeClube) {
     REGISTRO *reg = *registro;
     int i = 0;
 
@@ -12,16 +12,31 @@ void recuperarRegistro(REGISTRO **registro, FILE *arquivo) {
     fread(&reg->idade, sizeof(int), 1, arquivo);
 
     fread(&reg->tamNomeJog, sizeof(int), 1, arquivo);
+    if (reg->tamNomeJog > *maxNomeJog) {
+        *maxNomeJog = reg->tamNomeJog + 5;
+        reg->nomeJogador = realloc(reg->nomeJogador, *maxNomeJog *sizeof(char));
+        if (reg->nomeJogador == NULL) exit(1);
+    }
     for(i = 0; i < reg->tamNomeJog; i++)
         reg->nomeJogador[i] = getc(arquivo);
     reg->nomeJogador[i] = '\0';
 
     fread(&reg->tamNacionalidade, sizeof(int), 1, arquivo);
+    if (reg->tamNacionalidade > *maxNacionalidade) {
+        *maxNacionalidade = reg->tamNacionalidade + 5;
+        reg->nacionalidade = realloc(reg->nacionalidade, *maxNacionalidade * sizeof(char));
+        if (reg->nacionalidade == NULL) exit(1);
+    }
     for(i = 0; i < reg->tamNacionalidade; i++)
         reg->nacionalidade[i] = getc(arquivo);
     reg->nacionalidade[i] = '\0';
 
     fread(&reg->tamNomeClube, sizeof(int), 1, arquivo);
+    if (reg->tamNomeClube > *maxNomeClube) {
+        *maxNomeClube = reg->tamNomeClube + 5;
+        reg->nomeClube = realloc(reg->nomeClube, *maxNomeClube * sizeof(char));
+        if (reg->nomeClube == NULL) exit(1);
+    }
     for(i = 0; i < reg->tamNomeClube; i++)
         reg->nomeClube[i] = getc(arquivo);
     reg->nomeClube[i] = '\0';
@@ -51,7 +66,7 @@ void comandoBusca(int *nroComandos, char (*comando)[5][10], char (*palavraChave)
 
     scanf("%d", nroComandos);
 
-    getchar();     // Pegar o caractere '\n'
+    getchar();      // Pegar o caractere '\n'
     
     for (j = 0; j < *nroComandos; j++) {
         c = getchar();
@@ -61,9 +76,8 @@ void comandoBusca(int *nroComandos, char (*comando)[5][10], char (*palavraChave)
         }
         (*comando)[j][i] = '\0';
 
-        scan_quote_string(temp);
-        strcpy((*palavraChave)[j], temp);
-        c = getchar();
+        scan_quote_string((*palavraChave)[j]);
+        getchar();
     }
 }
 
@@ -128,8 +142,12 @@ void selectFrom(char *nomeArquivo) {
     char c = '\0';
     int nroRegistros = 0;
 
+    int maxNomeJog = 10;
+    int maxNacionalidade = 35;
+    int maxNomeClube = 35;
+
     REGISTRO *registro;
-    alocarRegistro(&registro);
+    alocarRegistro(&registro, maxNomeJog, maxNacionalidade, maxNomeClube);
 
     FILE *arquivo = NULL;
     arquivo = fopen(nomeArquivo, "rb");
@@ -144,7 +162,7 @@ void selectFrom(char *nomeArquivo) {
     while ((c = getc(arquivo)) != EOF) {
             ungetc(c, arquivo);
 
-            recuperarRegistro(&registro, arquivo);
+            recuperarRegistro(&registro, arquivo, &maxNomeJog, &maxNacionalidade, &maxNomeClube);
 
             if (registro->removido == '0') {
                 impressaoRegistro(registro);
@@ -166,15 +184,20 @@ void selectFromWhere(char *nomeArquivo, int nroBuscas) {
     char comando[5][10];        // Contêm os campos que devem ser buscados (Ex.id, nome)
     char palavraChave[5][30];   // Contêm o que deve ser buscado (Ex. 1637, "Calleri")
     char c = '\0';
+
     int nroComandos = 0;        // Número de comandos em cada busca
     int nroRegistros = 0;       // Número de registros encontrados em uma busca
     int retornoBusca = 0;       // Retorno da função Busca
+
+    int maxNomeJog = 2;
+    int maxNacionalidade = 2;
+    int maxNomeClube = 2;
     
     FILE *arquivo = NULL;       // Arquivo no qual a busca será realizada
     arquivo = fopen(nomeArquivo, "rb");
 
     REGISTRO *registro;
-    alocarRegistro(&registro);
+    alocarRegistro(&registro, maxNomeJog, maxNacionalidade, maxNomeClube);
 
     if (registro == NULL || testarArquivo(arquivo, nomeArquivo) == 1) {
         desalocarRegistro(&registro);
@@ -190,7 +213,7 @@ void selectFromWhere(char *nomeArquivo, int nroBuscas) {
         while ((c = getc(arquivo)) != EOF) {
             ungetc(c, arquivo);
 
-            recuperarRegistro(&registro, arquivo);
+            recuperarRegistro(&registro, arquivo, &maxNomeJog, &maxNacionalidade, &maxNomeClube);
 
             if (registro->removido == '0') {
                 retornoBusca = busca(registro, nroComandos, comando, palavraChave);

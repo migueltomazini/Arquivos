@@ -42,7 +42,7 @@ e um arquivo binário como saída*/
 
     // Funções auxiliares 
     void inserirRegistro(REGISTRO *registro, FILE *arquivo);
-    void alocarRegistro(REGISTRO **registro);
+    void alocarRegistro(REGISTRO **registro, int maxNomeJog, int maxNacionalidade, int maxNomeClube);
     void desalocarRegistro(REGISTRO **registro);
 
     // Lista o arquivo de saída no modo binário usando a função fornecida binarioNaTela (Funcionalidade 1)
