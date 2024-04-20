@@ -11,31 +11,33 @@ Miguel Rodrigues Tomazini - 14599300
 (2024)
 */
 
-#include "funcoes.h"
+#include "funcoes.h" // Inclui o arquivo de cabeçalho que contém as definições das funções
 
 int main() {
-    int comando = -1;
-    int nroBuscas;
-    char nomeArquivoCsv[50];
-    char nomeArquivoBin[50];
+    int comando = -1; // Variável para armazenar o comando escolhido pelo usuário
+    int nroBuscas; // Variável para armazenar o número de buscas, usado na opção 3
+    char nomeArquivoCsv[50]; // String para armazenar o nome do arquivo CSV
+    char nomeArquivoBin[50]; // String para armazenar o nome do arquivo binário
 
+    // Recebe o comando escolhido pelo usuário
     scanf("%d", &comando);
 
+    // Executa a ação correspondente ao comando escolhido
     switch (comando) {
-    case 1:
-        scanf(" %s", nomeArquivoCsv);
-        scanf(" %s", nomeArquivoBin);
-        createTable(nomeArquivoCsv, nomeArquivoBin);
-        binarioNaTela(nomeArquivoBin);
+    case 1: // Caso o comando seja 1 (criar tabela)
+        scanf(" %s", nomeArquivoCsv); // Recebe o nome do arquivo CSV
+        scanf(" %s", nomeArquivoBin); // Recebe o nome do arquivo binário
+        createTable(nomeArquivoCsv, nomeArquivoBin); // Chama a função para criar a tabela
+        binarioNaTela(nomeArquivoBin); // Exibe o conteúdo do arquivo binário na tela
         break;
-    case 2:
-        scanf (" %s", nomeArquivoBin);
-        selectFrom(nomeArquivoBin);
+    case 2: // Caso o comando seja 2 (imprimir todos os registros)
+        scanf(" %s", nomeArquivoBin); // Recebe o nome do arquivo binário
+        selectFrom(nomeArquivoBin); // Chama a função para imprimir todos os registros
         break;
-    case 3:
-        scanf(" %s", nomeArquivoBin);
-        scanf("%d", &nroBuscas);
-        selectFromWhere(nomeArquivoBin, nroBuscas);
+    case 3: // Caso o comando seja 3 (realizar buscas)
+        scanf(" %s", nomeArquivoBin); // Recebe o nome do arquivo binário
+        scanf("%d", &nroBuscas); // Recebe o número de buscas
+        selectFromWhere(nomeArquivoBin, nroBuscas); // Chama a função para realizar buscas
     default:
         break;
     }
