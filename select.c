@@ -43,7 +43,7 @@ int testarArquivo(FILE *arquivo, char *nomeArquivo) {
     return 0;       // Retorna 0 se a abertura ocorrer sem problemas
 }
 
-int comandoBusca(int *nroComandos, char (*comando)[5][10], char (*palavraChave)[5][30]) {
+void comandoBusca(int *nroComandos, char (*comando)[5][10], char (*palavraChave)[5][30]) {
     int i;
     int j;
     char c = '\0';
@@ -61,21 +61,10 @@ int comandoBusca(int *nroComandos, char (*comando)[5][10], char (*palavraChave)[
         }
         (*comando)[j][i] = '\0';
 
-        if (strcmp((*comando)[j], "id")  == 0 || 
-            strcmp((*comando)[j], "idade") == 0) {
-            c = getchar();
-            for (i = 0; (c != ' ') && (c != '\n'); i++) {
-                (*palavraChave)[j][i] = c;
-                c = getchar();
-            }
-            (*palavraChave)[j][i] = '\0';
-        } else {
-            scan_quote_string(temp);
-            strcpy((*palavraChave)[j], temp);
-            c = getchar();
-        }
+        scan_quote_string(temp);
+        strcpy((*palavraChave)[j], temp);
+        c = getchar();
     }
-    return j;
 }
 
 /* Função que realiza a busca apartir de um comando (categoria) e a palavra chave
@@ -196,7 +185,7 @@ void selectFromWhere(char *nomeArquivo, int nroBuscas) {
         nroRegistros = 0;
 
         fseek(arquivo, TAM_CABECALHO, SEEK_SET);    // Voltar ao início desconsiderando cabeçalho
-        nroComandos = comandoBusca(&nroComandos, &comando, &palavraChave);
+        comandoBusca(&nroComandos, &comando, &palavraChave); // O erro está nessa linha
         printf("Busca %d\n\n", j);
         while ((c = getc(arquivo)) != EOF) {
             ungetc(c, arquivo);
