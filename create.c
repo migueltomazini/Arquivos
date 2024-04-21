@@ -34,7 +34,7 @@ void alocarRegistro(REGISTRO **registro, int maxNomeJog, int maxNacionalidade, i
 
     // Verifica se a alocação de memória foi bem-sucedida
     if (*registro == NULL) 
-        exit(1); // Encerra o programa se não for possível alocar memória
+        return; // Retorna se não for possível alocar memória
 
     // Aloca memória para os campos de strings dentro da estrutura REGISTRO
     (*registro)->nomeJogador = malloc(maxNomeJog * sizeof(char));
@@ -44,7 +44,7 @@ void alocarRegistro(REGISTRO **registro, int maxNomeJog, int maxNacionalidade, i
     // Verifica se a alocação de memória foi bem-sucedida para os campos de strings
     if ((*registro)->nomeJogador == NULL || (*registro)->nomeClube == NULL || 
         (*registro)->nacionalidade == NULL)
-        exit(1); // Encerra o programa se não for possível alocar memória
+        return; // Retorna se não for possível alocar memória
 }
 
 // Função auxiliar responsável por desalocar a memória do registro
