@@ -204,7 +204,3 @@ void createTable(char *nomeArquivoCsv, char *nomeArquivoBin) {
     fclose(arquivo);
     fclose(dados);
 }
-
-void createIndex(char *nomeArquivo, char *nomeIndice) {
-    
-}
