@@ -128,7 +128,7 @@ void Registro(FILE *dados, FILE *arquivo) {
         registro->tamNacionalidade = i; // Atualiza o tamanho da nacionalidade
         
         // Loop para ler o nome do clube
-        for (i = 0; (c = getc(dados)) != '\n'; i++) {   
+        for (i = 0; (c = getc(dados)) != '\n'; i++) {  
             // Verifica se é necessário realocar memória para o nome do clube
             if (i == maxNomeClube - 1) {
                 maxNomeClube += 5; // Aumenta o tamanho máximo
@@ -203,4 +203,8 @@ void createTable(char *nomeArquivoCsv, char *nomeArquivoBin) {
     // Fecha os arquivos
     fclose(arquivo);
     fclose(dados);
+}
+
+void createIndex(char *nomeArquivo, char *nomeIndice) {
+    
 }

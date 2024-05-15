@@ -12,6 +12,10 @@
     typedef struct cabecalho_ CABECALHO;
     typedef struct registro_ REGISTRO;
 
+    // Definição das estruturas CABECALHO e REGISTRO do índice
+    typedef struct cabecalho_ind_ CABECALHO_IND;
+    typedef struct registro_ind_ REGISTRO_IND;
+
     struct cabecalho_ {
         char status;                // '0' para inconsistente / '1' para OK
         long int topo;              // Ponteiro para o topo da pilha de registros removidos
@@ -34,6 +38,15 @@
         char *nomeClube;            // Nome do clube
     };
 
+    struct cabecalho_ind_ {
+        char status;                // '0' para inconsistente / '1' para OK
+    };
+
+    struct registro_ind {
+        int id;                     // ID do registro
+        int byteOffset;             // Byte offset do registro de dados referente ao id
+    };
+
     // Funções fornecidas
     void binarioNaTela(char *nomeArquivoBinario); // Exibe o conteúdo de um arquivo binário na tela
     void scan_quote_string(char *str); // Trata strings com aspas no formato CSV
@@ -49,5 +62,11 @@
     void selectFrom(char *nomeArquivo);
     // Função que realiza n buscas em um dado arquivo (Funcionalidade 3)
     void selectFromWhere(char *nomeArquivo, int nroBuscas);
+    // Função que cria um índice a partir da chave primária do arquivo de dados (Funcionalidade 4)
+    void createIndex(char *nomeArquivo, char *nomeIndice);
+    // Função responsável por remover dados de um arquivo (Funcionalidade 5)
+    void deleteFromWhere(char *nomeArquivo, char *nomeIndice, int nroRemocoes);
+    // Função responsável por inserir dados em um arquivo (Funcionalidade 6)
+    void insertInto(char *nomeArquivo, char *nomeIndice, int nroAdicoes);
     
 #endif // FUNCOES_H
