@@ -138,7 +138,23 @@ void Registro(FILE *dados, FILE *arquivo) {
             registro->nomeClube[i] = c; // Armazena o caractere no nome do clube
         }
         registro->nomeClube[i] = '\0'; // Adiciona o terminador de string
-        registro->tamNomeClube = i; // Atualiza o tamanho do nome do clube
+
+        char aux[30];
+        int i=0, j=0;
+        while (registro->nomeClube[i]!= '\0')
+        {
+            if (registro->nomeClube[i]!='\r')
+            {
+                aux[j]=registro->nomeClube[i];
+                j++;
+            }
+            i++;
+            
+        }
+        
+        aux[j]='\0';
+        strcpy(registro->nomeClube, aux);
+        registro->tamNomeClube = j; // Atualiza o tamanho do nome do clube
         
         // Calcula o tamanho total do registro
         registro->tamanhoRegistro = (sizeof(char) + 6 * sizeof(int) + sizeof(long int) +

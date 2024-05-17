@@ -51,9 +51,9 @@ void recuperarRegistro(REGISTRO **registro, FILE *arquivo, int *maxNomeJog, int 
 // Função auxiliar para abrir (modo leitura) e testar o arquivo
 int testarArquivo(FILE *arquivo, char *nomeArquivo) {
     char status;
-
+    fread(&status, sizeof(char), 1, arquivo);
     // Verifica se o arquivo ou a leitura do status falharam
-    if (arquivo == NULL || fread(&status, sizeof(char), 1, arquivo) == 0) {
+    if (arquivo == NULL || status =='0') {
         printf("Falha no processamento do arquivo.\n");
         return 1; // Retorna 1 se a abertura ou a leitura do status falharam
     }
@@ -179,7 +179,7 @@ void selectFrom(char *nomeArquivo) {
     // Verifica se o arquivo foi aberto corretamente e se o processamento falhou
     if (registro == NULL || testarArquivo(arquivo, nomeArquivo) == 1) {
         desalocarRegistro(&registro); // Libera a memória alocada para o registro
-        return; // Retorna se houve falha no processamento
+        exit (0); // Retorna se houve falha no processamento
     }
 
     fseek(arquivo, TAM_CABECALHO, SEEK_SET); // Posiciona o ponteiro do arquivo após o cabeçalho
