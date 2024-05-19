@@ -42,7 +42,7 @@
         char status;                // '0' para inconsistente / '1' para OK
     };
 
-    struct registro_ind {
+    struct registro_ind_ {
         int id;                     // ID do registro
         int byteOffset;             // Byte offset do registro de dados referente ao id
     };
