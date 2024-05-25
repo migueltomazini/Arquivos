@@ -44,11 +44,17 @@ int main() {
         scanf(" %s", nomeIndice); // Recebe o nome do índice
         createIndex(nomeArquivoBin, nomeIndice); // Chama a função para criar o índice
         binarioNaTela(nomeArquivoBin); // Exibe o conteúdo do índice na tela
+        binarioNaTela(nomeIndice);
+        break;
     case 5:
         scanf(" %s", nomeArquivoBin); // Recebe o nome do arquivo
         scanf(" %s", nomeIndice); // Recebe o nome do índice
         scanf("%d", &nroRepeticoes); // Recebe o numero de remoções
+        //selectFromWhere(nomeArquivoBin, nroRepeticoes);
         deleteFromWhere(nomeArquivoBin, nomeIndice, nroRepeticoes); // Chama a função para realizar remoções
+        binarioNaTela(nomeArquivoBin);
+        binarioNaTela(nomeIndice);
+        break;
 
     case 6:
         scanf(" %s", nomeArquivoBin); // Recebe o nome do arquivo

@@ -44,17 +44,31 @@
 
     struct registro_ind_ {
         int id;                     // ID do registro
-        int byteOffset;             // Byte offset do registro de dados referente ao id
+        long int byteOffset;             // Byte offset do registro de dados referente ao id
     };
 
     // Funções fornecidas
     void binarioNaTela(char *nomeArquivoBinario); // Exibe o conteúdo de um arquivo binário na tela
     void scan_quote_string(char *str); // Trata strings com aspas no formato CSV
-
+    
     // Funções auxiliares 
-    void inserirRegistro(REGISTRO *registro, FILE *arquivo); // Insere um registro no arquivo binário
-    void alocarRegistro(REGISTRO **registro, int maxNomeJog, int maxNacionalidade, int maxNomeClube); // Aloca memória para um registro
-    void desalocarRegistro(REGISTRO **registro); // Desaloca a memória alocada para um registro
+
+    // Função auxiliar para abrir e testar o arquivo
+    int testarArquivo(FILE *arquivo, char *nomeArquivo); 
+    // Insere um registro no arquivo binário
+    void inserirRegistro(REGISTRO *registro, FILE *arquivo); 
+    // Aloca memória para um registro
+    void alocarRegistro(REGISTRO **registro, int maxNomeJog, int maxNacionalidade, int maxNomeClube); 
+    // Desaloca a memória alocada para um registro
+    void desalocarRegistro(REGISTRO **registro); 
+    // Função auxiliar para recuperar um registro do arquivo binário
+    void recuperarRegistro(REGISTRO **registro, FILE *arquivo, int *maxNomeJog, int *maxNacionalidade, int *maxNomeClube);
+    // Função para processar os comandos de busca
+    void comandoBusca(int *nroComandos, char (*comando)[5][10], char (*palavraChave)[5][100]);
+    // Função de buscas nos registros
+    int busca(REGISTRO *registro, int nroComandos, char comando[5][10], char palavraChave[5][100]);
+
+    // Funções principais
 
     // Lista o arquivo de saída no modo binário usando a função fornecida binarioNaTela (Funcionalidade 1)
     void createTable(char *nomeArquivoCsv, char *nomeArquivoBin);

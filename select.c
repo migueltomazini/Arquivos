@@ -48,7 +48,7 @@ void recuperarRegistro(REGISTRO **registro, FILE *arquivo, int *maxNomeJog, int 
         reg->nomeClube[i] = getc(arquivo); // Lê um caractere do arquivo e o armazena no nome do clube do jogador
     reg->nomeClube[i] = '\0'; // Adiciona o caractere nulo ao final do nome do clube do jogador
 }
-// Função auxiliar para abrir (modo leitura) e testar o arquivo
+// Função auxiliar para abrir e testar o arquivo
 int testarArquivo(FILE *arquivo, char *nomeArquivo) {
     char status;
     fread(&status, sizeof(char), 1, arquivo);
@@ -254,7 +254,7 @@ void selectFromWhere(char *nomeArquivo, int nroBuscas) {
                     impressaoRegistro(registro); // Imprime os campos do registro
                     nroRegistros++; // Incrementa o contador de registros encontrados
 
-                    // Se a busca for pelo ID e o registro for encontrado, interrompe a busca
+                    // Se a busca for pelo ID, interrompe a busca
                     if (retornoBusca == 2 || retornoBusca == 3)
                         break;
                 }
