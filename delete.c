@@ -96,7 +96,7 @@ void updateCabecalho(FILE *arquivo, int nroRemocoes) {
 // Função responsável por remover registros do arquivo a partir de n buscas que utilizando m campos
 // em cada uma delas (Funcionalidade 5)
 void deleteFromWhere(char *nomeArquivo, char *nomeIndice, int nroRemocoes) {
-    char comando[5][10]; // Matriz para armazenar os comandos de busca (Ex: "id", "nomeJogador")
+    char comando[5][20]; // Matriz para armazenar os comandos de busca (Ex: "id", "nomeJogador")
     char palavraChave[5][100]; // Matriz para armazenar as palavras-chave de busca
     char c = '\0'; // Caractere temporário para leitura
 
@@ -113,7 +113,13 @@ void deleteFromWhere(char *nomeArquivo, char *nomeIndice, int nroRemocoes) {
     int tamRegRem = 0;
     
     FILE *arquivo = NULL; // Ponteiro para o arquivo binário
-    arquivo = fopen(nomeArquivo, "r+b"); // Abre o arquivo no modo leitura e escrita binária
+    if ((arquivo = fopen(nomeArquivo, "r+b")) == NULL) {
+        printf("Falha no processamento do arquivo.\n");
+        return;
+    }
+
+    if (testarArquivo(arquivo, nomeArquivo) == 1)
+        return;  
 
     // Cria o arquivo de índice, para uso nas buscas a serem realizadas na função
     createIndex(nomeArquivo, nomeIndice);
@@ -122,7 +128,8 @@ void deleteFromWhere(char *nomeArquivo, char *nomeIndice, int nroRemocoes) {
     alocarRegistro(&registro, maxNomeJog, maxNacionalidade, maxNomeClube); // Aloca memória para o registro
 
     // Verifica se o arquivo foi aberto corretamente e se o processamento falhou
-    if (registro == NULL || testarArquivo(arquivo, nomeArquivo) == 1) {
+    if ((arquivo = fopen(nomeArquivo, "r+b")) == NULL 
+         || testarArquivo(arquivo, nomeArquivo) == 1) {
         desalocarRegistro(&registro); // Libera a memória alocada para o registro
         return; // Retorna se houve falha no processamento
     }

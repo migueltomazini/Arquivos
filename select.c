@@ -62,7 +62,7 @@ int testarArquivo(FILE *arquivo, char *nomeArquivo) {
 }
 
 // Função para processar os comandos de busca
-void comandoBusca(int *nroComandos, char (*comando)[5][10], char (*palavraChave)[5][100]) {
+void comandoBusca(int *nroComandos, char (*comando)[5][20], char (*palavraChave)[5][100]) {
     int i;
     int j;
     char c = '\0';
@@ -89,7 +89,7 @@ void comandoBusca(int *nroComandos, char (*comando)[5][10], char (*palavraChave)
 //   1 se o registro não possui todos os atributos buscados
 //   2 se o registro possui os atributos buscados e a busca deve ser interrompida (comando = "id")
 //   3 se o registro não possui os atributos buscados e a busca deve ser interrompida (comando = "id")
-int busca(REGISTRO *registro, int nroComandos, char comando[5][10], char palavraChave[5][100]) {
+int busca(REGISTRO *registro, int nroComandos, char comando[5][20], char palavraChave[5][100]) {
     int temp; // Variável temporária para armazenar valores convertidos
     int retorno = 1; // Inicializa o retorno como 1 (registro não possui todos os atributos buscados)
 
@@ -206,7 +206,7 @@ void selectFrom(char *nomeArquivo) {
 
 // Função que realiza n buscas em um dado arquivo (Funcionalidade 3)
 void selectFromWhere(char *nomeArquivo, int nroBuscas) {
-    char comando[5][10]; // Matriz para armazenar os comandos de busca (Ex: "id", "nomeJogador")
+    char comando[5][20]; // Matriz para armazenar os comandos de busca (Ex: "id", "nomeJogador")
     char palavraChave[5][100]; // Matriz para armazenar as palavras-chave de busca
     char c = '\0'; // Caractere temporário para leitura
 
