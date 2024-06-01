@@ -67,6 +67,7 @@
     void comandoBusca(int *nroComandos, char (*comando)[5][20], char (*palavraChave)[5][100]);
     // Função de buscas nos registros
     int busca(REGISTRO *registro, int nroComandos, char comando[5][20], char palavraChave[5][100]);
+   
 
     // Funções principais
 

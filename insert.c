@@ -175,25 +175,21 @@ void insertIntoAux(char *nomeArquivo) {
         return;
     }
 
-    long long int aux_anterior = cabecalho.topo; // anterior da onde eu quero inserir
-    long long int aux_atual = anterior->prox; // aonde eu quero inserir
-    int num = cabecalho.nroRegRem;
-    for (int i = 1; i < num; i++) { // pula o primeiro pq tratamos antes
+    long int aux_anterior = cabecalho.topo; // anterior da onde eu quero inserir
+    long int aux_atual = anterior->prox; // aonde eu quero inserir
+    while (aux_atual != -1) { // pula o primeiro pq tratamos antes
         /* existe tres casos:
         1- só tem um removido (feita acima)
         2- inserção no início (feita acima)
         3- inserção no meio (feita abaixo)
         4- chegou ao fim */
-
+         fseek(nomearq, aux_atual, SEEK_SET);
         REGISTRO* atual = (REGISTRO*) malloc(sizeof(REGISTRO));
-        if (!atual) {
-            printf("Falha no processamento do arquivo.\n");
-            exit(1);
-        }
-        fseek(nomearq, aux_atual, SEEK_SET);
         resgatarRegistro(atual, nomearq);
 
         if (registro->tamanhoRegistro <= atual->tamanhoRegistro) {
+                            
+              anterior->prox = atual->prox;
             fseek(nomearq, (-1) * atual->tamanhoRegistro, SEEK_CUR);
             int tamaux = registro->tamanhoRegistro;
             registro->tamanhoRegistro = atual->tamanhoRegistro;
@@ -201,15 +197,11 @@ void insertIntoAux(char *nomeArquivo) {
             preeche_vazio(nomearq, atual->tamanhoRegistro - tamaux);
             cabecalho.nroRegRem--;
             cabecalho.nroRegArq++;
-            if (atual->prox == -1) { // se for o último
-                cabecalho.topo = -1;
-            } else {
-                cabecalho.topo = atual->prox;
-            }
-
-            anterior->prox = atual->prox;
             fseek(nomearq, aux_anterior, SEEK_SET);
             inserirRegistro(anterior, nomearq);
+            
+        
+            
             reinserir_cabecalho(nomearq, &cabecalho, '1');
             desalocarRegistro(&atual);
             desalocarRegistro(&anterior);
@@ -217,10 +209,11 @@ void insertIntoAux(char *nomeArquivo) {
             fclose(nomearq);
             return; 
         }
-        desalocarRegistro(&anterior);
+                 
         anterior = atual;
         aux_anterior = aux_atual;
         aux_atual = atual->prox;
+        
     } 
 
     fseek(nomearq, 0, SEEK_END);
@@ -236,5 +229,5 @@ void insertInto(char *nomeArquivo, char *nomeIndice, int nroAdicoes) {
     for (int i = 0; i < nroAdicoes; i++) {
         insertIntoAux(nomeArquivo);
     }
-    createIndex(nomeArquivo, nomeIndice);
+    //createIndex(nomeArquivo, nomeIndice);
 }
