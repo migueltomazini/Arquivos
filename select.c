@@ -1,10 +1,12 @@
 #include "funcoes.h"
 
 // Função auxiliar para recuperar um registro do arquivo binário
-void recuperarRegistro(REGISTRO **registro, FILE *arquivo, int *maxNomeJog, int *maxNacionalidade, int *maxNomeClube) {
-
+void recuperarRegistro(REGISTRO **registro, FILE *arquivo, int byteOffset ,int *maxNomeJog, int *maxNacionalidade, int *maxNomeClube) {
     REGISTRO *reg = *registro; // Declaração e inicialização de um ponteiro para o registro
     int i = 0; // Variável de controle para loops
+
+    if (byteOffset != -1)
+        fseek(arquivo, byteOffset, SEEK_SET);
 
     // Lê os campos do registro do arquivo binário
     fread(&reg->removido, sizeof(char), 1, arquivo); // Lê o campo "removido" do registro
@@ -89,26 +91,17 @@ void comandoBusca(int *nroComandos, char (*comando)[5][20], char (*palavraChave)
         getchar(); // Descarta o caractere de quebra de linha após a palavra-chave
     }
 }
+
 // Função de busca nos registros
 // Retorna:
 //   0 se o registro possui todos os atributos buscados
 //   1 se o registro não possui todos os atributos buscados
-//   2 se o registro possui os atributos buscados e a busca deve ser interrompida (comando = "id")
-//   3 se o registro não possui os atributos buscados e a busca deve ser interrompida (comando = "id")
-int busca(REGISTRO *registro, int nroComandos, char comando[5][20], char palavraChave[5][100]) {
+int busca(REGISTRO *registro, REGISTRO_IND *vetorInd, int nroComandos, char comando[5][20], char palavraChave[5][100]) {
     int temp; // Variável temporária para armazenar valores convertidos
     int retorno = 1; // Inicializa o retorno como 1 (registro não possui todos os atributos buscados)
 
     // Loop sobre todos os comandos de busca
     for (int i = 0; i < nroComandos; i++) {
-        // Verifica se o comando atual é "id"
-        if (strcmp(comando[i], "id") == 0) {
-            temp = atoi(palavraChave[i]); // Converte a palavra-chave para inteiro
-            // Se o valor convertido não corresponder ao ID do registro, retorna o valor atual de retorno
-            if (temp != registro->id)
-                return retorno;
-            retorno = 3; // Define o retorno como 3 (registro possui os atributos buscados e busca deve ser interrompida)
-        }
         // Verifica se o comando atual é "idade"
         if (strcmp(comando[i], "idade") == 0) {
             temp = atoi(palavraChave[i]); // Converte a palavra-chave para inteiro
@@ -139,6 +132,35 @@ int busca(REGISTRO *registro, int nroComandos, char comando[5][20], char palavra
     // Se todas as verificações passarem, o registro possui todos os atributos buscados
     // Retorna 0 se a busca deve continuar e 2 se a busca deve ser interrompida (apenas para "id")
     return (retorno - 1); // O registro possui os atributos buscados se o retorno for 0 ou 2
+}
+
+long int buscaId (REGISTRO *registro, REGISTRO_IND *vetorInd, int nroRegistros, int nroComandos, char comando[5][20], char palavraChave[5][100]) {
+    int left = 0;
+    int right = nroRegistros - 1;
+    int middle = 0;
+
+    int i = 0;
+    int id = 0;
+
+    while (i < nroComandos && strcmp(comando[i], "id") != 0)
+        i++;
+
+    id = atoi(palavraChave[i]);
+
+    while(left <= right) {
+        middle = left + (right - left) / 2;
+        printf("%d %d %d \n", id, vetorInd[middle].id, middle);
+
+        if (vetorInd[middle].id == id)
+            return vetorInd[middle].byteOffset;
+        if (vetorInd[middle].id < id)
+            left = middle + 1;
+        else   
+            right = middle - 1;
+    }
+
+    // Caso o id não seja encontrado
+    return -1;
 }
 
 // Função para imprimir os campos de um registro
@@ -191,10 +213,8 @@ void selectFrom(char *nomeArquivo) {
     fseek(arquivo, TAM_CABECALHO, SEEK_SET); // Posiciona o ponteiro do arquivo após o cabeçalho
 
     // Loop para ler e imprimir os registros do arquivo
-    while ((c = getc(arquivo)) != EOF) { // Lê cada caractere do arquivo até encontrar o final do arquivo (EOF)
-        ungetc(c, arquivo); // Coloca o caractere de volta no buffer do arquivo
-
-        recuperarRegistro(&registro, arquivo, &maxNomeJog, &maxNacionalidade, &maxNomeClube); // Recupera o registro do arquivo
+    while (!feof(arquivo)) { // Lê cada caractere do arquivo até encontrar o final do arquivo (EOF)     
+        recuperarRegistro(&registro, arquivo, -1, &maxNomeJog, &maxNacionalidade, &maxNomeClube); // Recupera o registro do arquivo
 
         if (registro->removido == '0') { // Verifica se o registro não foi removido
             impressaoRegistro(registro); // Imprime os campos do registro
@@ -211,67 +231,100 @@ void selectFrom(char *nomeArquivo) {
 }
 
 // Função que realiza n buscas em um dado arquivo (Funcionalidade 3)
-void selectFromWhere(char *nomeArquivo, int nroBuscas) {
+void selectFromWhere(char *nomeArquivo, char *nomeIndice, int nroBuscas) {
     char comando[5][20]; // Matriz para armazenar os comandos de busca (Ex: "id", "nomeJogador")
     char palavraChave[5][100]; // Matriz para armazenar as palavras-chave de busca
     char c = '\0'; // Caractere temporário para leitura
 
     int nroComandos = 0; // Número de comandos de busca em cada busca
-    int nroRegistros = 0; // Número de registros encontrados em uma busca
+    int nroRegistros = 0; // Número de registros totais 
+    int nroRegistrosEncontrados = 0; // Número de registros encontrados em uma busca
+    
     int retornoBusca = 0; // Retorno da função de busca
+    int byteOffset = 0; // Endereço do registro para busca com id
 
     // Tamanhos máximos iniciais dos campos de texto
     int maxNomeJog = 30;
     int maxNacionalidade = 30;
     int maxNomeClube = 30;
+
+    // Cria o arquivo de índice, para uso nas buscas a serem realizadas na função
+    createIndex(nomeArquivo, nomeIndice);
     
-    FILE *arquivo = NULL; // Ponteiro para o arquivo binário
-    arquivo = fopen(nomeArquivo, "rb"); // Abre o arquivo no modo leitura binária
+    // Abertura do arquivo principal
+    FILE *arquivo = NULL;
+    arquivo = fopen(nomeArquivo, "rb");
+
+    // Abertura do arquivo de índice
+    FILE *indice = NULL;
+    indice = fopen(nomeIndice, "rb");
 
     REGISTRO *registro; // Declaração de um ponteiro para o registro
     alocarRegistro(&registro, maxNomeJog, maxNacionalidade, maxNomeClube); // Aloca memória para o registro
 
+    REGISTRO_IND *vetorInd;
+    vetorInd = recoverIndex(arquivo, indice);
+
+    // Recuperar número de registros nó arquivo
+    fseek(arquivo, 17, SEEK_SET);
+    fread(&nroRegistros, sizeof(int), 1, arquivo);  
+
     // Verifica se o arquivo foi aberto corretamente e se o processamento falhou
-    if (registro == NULL || testarArquivo(arquivo, nomeArquivo) == 1) {
+    if (registro == NULL || testarArquivo(arquivo, nomeArquivo) == 1 || testarArquivo(indice, nomeIndice) == 1) {
         desalocarRegistro(&registro); // Libera a memória alocada para o registro
         return; // Retorna se houve falha no processamento
     }
 
     // Loop para realizar as buscas especificadas
     for (int j = 1; j <= nroBuscas; j++) {
-        nroRegistros = 0; // Reinicia o contador de registros encontrados
+        nroRegistrosEncontrados = 0; // Reinicia o contador de registros encontrados
 
         fseek(arquivo, TAM_CABECALHO, SEEK_SET); // Volta ao início do arquivo, após o cabeçalho
         comandoBusca(&nroComandos, &comando, &palavraChave); // Lê os comandos de busca e as palavras-chave
 
         printf("Busca %d\n\n", j); // Imprime o número da busca
 
-        // Loop para ler e processar os registros do arquivo
-        while ((c = getc(arquivo)) != EOF) { // Lê cada caractere do arquivo até encontrar o final do arquivo (EOF)
-            ungetc(c, arquivo); // Coloca o caractere de volta no buffer do arquivo
+        // Trata os casos nos quais a busca envolvem um id, podendo ser realizadas a partir do arquivo
+        // de índice
+        if (strcmp(comando[0], "id") == 0) {
+            byteOffset = buscaId(registro, vetorInd, nroRegistros, nroComandos, comando, palavraChave);
+            if (byteOffset != -1) {
+                printf("aa");
+                recuperarRegistro(&registro, arquivo, byteOffset, &maxNomeJog, &maxNacionalidade, &maxNomeClube);
+                retornoBusca = busca(registro, vetorInd, nroComandos, comando, palavraChave);
 
-            recuperarRegistro(&registro, arquivo, &maxNomeJog, &maxNacionalidade, &maxNomeClube); // Recupera o registro do arquivo
+                if (retornoBusca == 0) {
+                    impressaoRegistro(registro); // Imprime os campos do registro
+                    nroRegistrosEncontrados++; // Incrementa o contador de registros encontrados
+                }
+            }
+            continue;
+        }
+
+        // Loop para ler e processar os registros do arquivo
+        while (!feof(arquivo)) { // Lê cada caractere do arquivo até encontrar o final do arquivo (EOF)
+            recuperarRegistro(&registro, arquivo, -1, &maxNomeJog, &maxNacionalidade, &maxNomeClube); // Recupera o registro do arquivo
 
             if (registro->removido == '0') { // Verifica se o registro não foi removido
-                retornoBusca = busca(registro, nroComandos, comando, palavraChave); // Realiza a busca no registro
+                retornoBusca = busca(registro, vetorInd, nroComandos, comando, palavraChave); // Realiza a busca no registro
 
                 // Verifica o resultado da busca e imprime o registro se correspondente
-                if (retornoBusca == 0 || retornoBusca == 2) {
+                if (retornoBusca == 0) {
                     impressaoRegistro(registro); // Imprime os campos do registro
-                    nroRegistros++; // Incrementa o contador de registros encontrados
-
-                    // Se a busca for pelo ID, interrompe a busca
-                    if (retornoBusca == 2 || retornoBusca == 3)
-                        break;
+                    nroRegistrosEncontrados++; // Incrementa o contador de registros encontrados
                 }
             }
         }
 
         // Verifica se nenhum registro foi encontrado durante a busca atual
-        if (nroRegistros == 0)
+        if (nroRegistrosEncontrados == 0)
             printf("Registro inexistente.\n\n"); // Imprime uma mensagem indicando que nenhum registro foi encontrado
     }
 
+    // Recria o arquivo de índice, de forma a descondiderar os registros removidos durante essa função
+    createIndex(nomeArquivo, nomeIndice);
+
+    free(vetorInd);
     desalocarRegistro(&registro); // Libera a memória alocada para o registro
     fclose(arquivo); // Fecha o arquivo após a leitura
 }

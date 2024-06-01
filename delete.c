@@ -121,11 +121,19 @@ void deleteFromWhere(char *nomeArquivo, char *nomeIndice, int nroRemocoes) {
     if (testarArquivo(arquivo, nomeArquivo) == 1)
         return;  
 
+
     // Cria o arquivo de índice, para uso nas buscas a serem realizadas na função
     createIndex(nomeArquivo, nomeIndice);
+    
+    // Abertura do arquivo de índice
+    FILE *indice = NULL;
+    indice = fopen(nomeIndice, "rb");
 
     REGISTRO *registro; // Declaração de um ponteiro para o registro
     alocarRegistro(&registro, maxNomeJog, maxNacionalidade, maxNomeClube); // Aloca memória para o registro
+
+    REGISTRO_IND *vetorInd;
+    vetorInd = recoverIndex(arquivo, indice);
 
     // Verifica se o arquivo foi aberto corretamente e se o processamento falhou
     if ((arquivo = fopen(nomeArquivo, "r+b")) == NULL 
@@ -142,13 +150,11 @@ void deleteFromWhere(char *nomeArquivo, char *nomeIndice, int nroRemocoes) {
         comandoBusca(&nroComandos, &comando, &palavraChave); // Lê os comandos de busca e as palavras-chave
 
         // Loop para ler e processar os registros do arquivo
-        while ((c = getc(arquivo)) != EOF) { // Lê cada caractere do arquivo até encontrar o final do arquivo (EOF)
-            ungetc(c, arquivo); // Coloca o caractere de volta no buffer do arquivo
-
-            recuperarRegistro(&registro, arquivo, &maxNomeJog, &maxNacionalidade, &maxNomeClube); // Recupera o registro do arquivo
+        while (!feof(arquivo)) { // Lê cada caractere do arquivo até encontrar o final do arquivo (EOF)
+            recuperarRegistro(&registro, arquivo, -1, &maxNomeJog, &maxNacionalidade, &maxNomeClube); // Recupera o registro do arquivo
 
             if (registro->removido == '0') { // Verifica se o registro já foi removido
-                retornoBusca = busca(registro, nroComandos, comando, palavraChave); // Realiza a busca no registro
+                retornoBusca = busca(registro, vetorInd, nroComandos, comando, palavraChave); // Realiza a busca no registro
 
                 // Verifica o resultado da busca e remove o registro se correspondente
                 if (retornoBusca == 0 || retornoBusca == 2) {
@@ -174,6 +180,7 @@ void deleteFromWhere(char *nomeArquivo, char *nomeIndice, int nroRemocoes) {
     // Recria o arquivo de índice, de forma a descondiderar os registros removidos durante essa função
     createIndex(nomeArquivo, nomeIndice);
 
+    free(vetorInd);
     desalocarRegistro(&registro); // Libera a memória alocada para o registro
     fclose(arquivo); // Fecha o arquivo após a leitura
 }

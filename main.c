@@ -37,8 +37,9 @@ int main() {
         break;
     case 3: // Caso o comando seja 3 (realizar buscas)
         scanf(" %s", nomeArquivoBin); // Recebe o nome do arquivo
+        scanf(" %s", nomeIndice);
         scanf("%d", &nroRepeticoes); // Recebe o número de buscas
-        selectFromWhere(nomeArquivoBin, nroRepeticoes); // Chama a função para realizar buscas
+        selectFromWhere(nomeArquivoBin, nomeIndice, nroRepeticoes); // Chama a função para realizar buscas
     case 4:
         scanf(" %s", nomeArquivoBin); // Recebe o nome do arquivo
         scanf(" %s", nomeIndice); // Recebe o nome do índice
