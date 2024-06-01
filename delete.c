@@ -109,25 +109,28 @@ void deleteFromWhere(char *nomeArquivo, char *nomeIndice, int nroRemocoes) {
     int maxNacionalidade = 30;
     int maxNomeClube = 30;
     
+    int nroRegistros = 0; // Número de registros totais
     int nroRegistrosRemovidos = 0; // Número de registros removidos no arquivo
-    int tamRegRem = 0;
+    int tamRegRem = 0; // Armazena o tamanho do registro a ser removido
+    int idIndex = 0; // Armazena a posição na qual o comando é id, caso exista
     
+    // Cria o arquivo de índice, para uso nas buscas a serem realizadas na função
+    createIndex(nomeArquivo, nomeIndice);
+    
+    // Abertura e testagem do arquivo principal
     FILE *arquivo = NULL; // Ponteiro para o arquivo binário
     if ((arquivo = fopen(nomeArquivo, "r+b")) == NULL) {
         printf("Falha no processamento do arquivo.\n");
         return;
     }
 
-    if (testarArquivo(arquivo, nomeArquivo) == 1)
-        return;  
+    // Abertura e testagem do arquivo de índice
+    FILE *indice = NULL; // Ponteiro para o arquivo binário
 
-
-    // Cria o arquivo de índice, para uso nas buscas a serem realizadas na função
-    createIndex(nomeArquivo, nomeIndice);
-    
-    // Abertura do arquivo de índice
-    FILE *indice = NULL;
-    indice = fopen(nomeIndice, "rb");
+    if ((indice = fopen(nomeIndice, "rb")) == NULL) {
+        printf("Falha no processamento do indice.\n");
+        return;
+    }  
 
     REGISTRO *registro; // Declaração de um ponteiro para o registro
     alocarRegistro(&registro, maxNomeJog, maxNacionalidade, maxNomeClube); // Aloca memória para o registro
@@ -135,19 +138,43 @@ void deleteFromWhere(char *nomeArquivo, char *nomeIndice, int nroRemocoes) {
     REGISTRO_IND *vetorInd;
     vetorInd = recoverIndex(arquivo, indice);
 
-    // Verifica se o arquivo foi aberto corretamente e se o processamento falhou
-    if ((arquivo = fopen(nomeArquivo, "r+b")) == NULL 
-         || testarArquivo(arquivo, nomeArquivo) == 1) {
+    // Verifica se os arquivos estão integros e se a alocação de registro e vetorInd funcionou
+    if (testarArquivo(arquivo) == 1 || testarArquivo(indice) == 1 || 
+        registro == NULL || vetorInd == NULL) {
         desalocarRegistro(&registro); // Libera a memória alocada para o registro
+        free(vetorInd);
         return; // Retorna se houve falha no processamento
     }
+
+    // Recuperar número de registros nó arquivo
+    fseek(arquivo, 17, SEEK_SET);
+    fread(&nroRegistros, sizeof(int), 1, arquivo);  
 
     // Loop para realizar as remoções especificadas
     for (int j = 1; j <= nroRemocoes; j++) {
         byteOffset = TAM_CABECALHO; // Reinicia o contador do Byte Offset
 
         fseek(arquivo, byteOffset, SEEK_SET); // Volta ao início do arquivo, após o cabeçalho
-        comandoBusca(&nroComandos, &comando, &palavraChave); // Lê os comandos de busca e as palavras-chave
+        idIndex = comandoBusca(&nroComandos, &comando, &palavraChave); // Lê os comandos de busca e as palavras-chave
+
+        // Trata os casos nos quais a remoção envolvem um id, podendo ser realizadas a partir do arquivo
+        // de índice
+        if (strcmp(comando[idIndex], "id") == 0) {
+            byteOffset = buscaId(registro, vetorInd, nroRegistros, nroComandos, comando, palavraChave);
+            if (byteOffset != -1) {
+                recuperarRegistro(&registro, arquivo, byteOffset, &maxNomeJog, &maxNacionalidade, &maxNomeClube);
+                retornoBusca = busca(registro, vetorInd, nroComandos, comando, palavraChave);
+
+                if (retornoBusca == 0) {
+                    removeRegistro(arquivo, registro, byteOffset); // Imprime os campos do registro
+                    updateList(arquivo, byteOffset, registro->tamanhoRegistro);
+                    // Retornar a posição do arquivo anterior a chamada das funções
+                    fseek(arquivo, byteOffset + registro->tamanhoRegistro, SEEK_SET);
+                    nroRegistrosRemovidos++; // Incrementa o contador de registros encontrados
+                }
+            }
+            continue;
+        }
 
         // Loop para ler e processar os registros do arquivo
         while (!feof(arquivo)) { // Lê cada caractere do arquivo até encontrar o final do arquivo (EOF)
@@ -160,15 +187,9 @@ void deleteFromWhere(char *nomeArquivo, char *nomeIndice, int nroRemocoes) {
                 if (retornoBusca == 0 || retornoBusca == 2) {
                     removeRegistro(arquivo, registro, byteOffset); // Remove o registro
                     updateList(arquivo, byteOffset, registro->tamanhoRegistro);
-
                     // Retornar a posição do arquivo anterior a chamada das funções
-                    fseek(arquivo, byteOffset + registro->tamanhoRegistro, SEEK_SET); 
-                    
+                    fseek(arquivo, byteOffset + registro->tamanhoRegistro, SEEK_SET);     
                     nroRegistrosRemovidos++; // Incrementa o contador de registros removidos
-                    
-                    // Se a busca for pelo ID, interrompe a busca
-                    if (retornoBusca == 2 || retornoBusca == 3)
-                        break;
                 }
             }
             byteOffset += registro->tamanhoRegistro; // Recalcula o novo Byte offset
