@@ -61,6 +61,8 @@ int main() {
         scanf(" %s", nomeIndice); // Recebe o nome do índice
         scanf("%d", &nroRepeticoes); // Recebe o numero de inserções
         insertInto(nomeArquivoBin, nomeIndice, nroRepeticoes); // Chama a função para realizar inserções
+    binarioNaTela(nomeArquivoBin);
+        binarioNaTela(nomeIndice);
     default:
         break;
     }

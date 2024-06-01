@@ -2,6 +2,7 @@
 
 // Função auxiliar para recuperar um registro do arquivo binário
 void recuperarRegistro(REGISTRO **registro, FILE *arquivo, int *maxNomeJog, int *maxNacionalidade, int *maxNomeClube) {
+
     REGISTRO *reg = *registro; // Declaração e inicialização de um ponteiro para o registro
     int i = 0; // Variável de controle para loops
 
@@ -12,6 +13,7 @@ void recuperarRegistro(REGISTRO **registro, FILE *arquivo, int *maxNomeJog, int 
     fread(&reg->id, sizeof(int), 1, arquivo); // Lê o ID do jogador
     fread(&reg->idade, sizeof(int), 1, arquivo); // Lê a idade do jogador
 
+
     // Lê o tamanho do nome do jogador e realoca memória se necessário
     fread(&reg->tamNomeJog, sizeof(int), 1, arquivo);
     if (reg->tamNomeJog > *maxNomeJog) { // Verifica se é necessário realocar memória para o nome do jogador
@@ -19,10 +21,14 @@ void recuperarRegistro(REGISTRO **registro, FILE *arquivo, int *maxNomeJog, int 
         reg->nomeJogador = realloc(reg->nomeJogador, *maxNomeJog * sizeof(char)); // Realoca memória para o nome do jogador
         if (reg->nomeJogador == NULL) exit(1); // Encerra o programa se não for possível alocar memória
     }
+
     // Lê o nome do jogador caractere por caractere
     for(i = 0; i < reg->tamNomeJog; i++)
-        reg->nomeJogador[i] = getc(arquivo); // Lê um caractere do arquivo e o armazena no nome do jogador
+                reg->nomeJogador[i] = getc(arquivo); // Lê um caractere do arquivo e o armazena no nome do jogador
+
+
     reg->nomeJogador[i] = '\0'; // Adiciona o caractere nulo ao final do nome do jogador
+                
 
     // Lê o tamanho da nacionalidade do jogador e realoca memória se necessário
     fread(&reg->tamNacionalidade, sizeof(int), 1, arquivo);
