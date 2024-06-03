@@ -68,15 +68,11 @@
     // Função para processar os comandos de busca
     int comandoBusca(int *nroComandos, char (*comando)[5][20], char (*palavraChave)[5][100]);
     // Função de buscas nos registros
-<<<<<<< HEAD
-    int busca(REGISTRO *registro, int nroComandos, char comando[5][20], char palavraChave[5][100]);
+    int busca(REGISTRO *registro, REGISTRO_IND *vetorInd, int nroComandos, char comando[5][20], char palavraChave[5][100]);
     void lixo (FILE *arquivo);
     void resgatarRegistro(REGISTRO *registro, FILE *arquivo);
-=======
-    int busca(REGISTRO *registro, REGISTRO_IND *vetorInd, int nroComandos, char comando[5][20], char palavraChave[5][100]);
     // Função para realizar a busca no caso dela utilizar o id
     long int buscaId(REGISTRO *registro, REGISTRO_IND *vetorInd, int nroRegistros, int nroComandos, char comando[5][20], char palavraChave[5][100]);
->>>>>>> 1a3903a6909228226bda7be35077e4ad72061f1a
    
 
     // Funções principais

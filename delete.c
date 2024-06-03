@@ -125,14 +125,10 @@ void deleteFromWhere(char *nomeArquivo, char *nomeIndice, int nroRemocoes) {
         exit(1); // Encerra o programa, caso haja falha no processamento
     }
 
-<<<<<<< HEAD
-    if (testarArquivo(arquivo, nomeArquivo) == 1)
+    if (testarArquivo(arquivo) == 1)
         exit(1); // Encerra o programa, caso haja falha no processamento 
-=======
-    // Abertura e testagem do arquivo de índice
-    FILE *indice = NULL; // Ponteiro para o arquivo binário
->>>>>>> 1a3903a6909228226bda7be35077e4ad72061f1a
 
+    FILE *indice = NULL;
     if ((indice = fopen(nomeIndice, "rb")) == NULL) {
         printf("Falha no processamento do indice.\n");
         return;
@@ -141,20 +137,8 @@ void deleteFromWhere(char *nomeArquivo, char *nomeIndice, int nroRemocoes) {
     REGISTRO *registro; // Declaração de um ponteiro para o registro
     alocarRegistro(&registro, maxNomeJog, maxNacionalidade, maxNomeClube); // Aloca memória para o registro
 
-<<<<<<< HEAD
-   
-=======
     REGISTRO_IND *vetorInd;
     vetorInd = recoverIndex(arquivo, indice);
-
-    // Verifica se os arquivos estão integros e se a alocação de registro e vetorInd funcionou
-    if (testarArquivo(arquivo) == 1 || testarArquivo(indice) == 1 || 
-        registro == NULL || vetorInd == NULL) {
-        desalocarRegistro(&registro); // Libera a memória alocada para o registro
-        free(vetorInd);
-        return; // Retorna se houve falha no processamento
-    }
->>>>>>> 1a3903a6909228226bda7be35077e4ad72061f1a
 
     // Recuperar número de registros nó arquivo
     fseek(arquivo, 17, SEEK_SET);
