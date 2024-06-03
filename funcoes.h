@@ -54,7 +54,7 @@
     // Funções auxiliares 
 
     // Função auxiliar para abrir e testar o arquivo
-    int testarArquivo(FILE *arquivo, char *nomeArquivo); 
+    int testarArquivo(FILE *arquivo); 
     // Insere um registro no arquivo binário
     void inserirRegistro(REGISTRO *registro, FILE *arquivo); 
     // Aloca memória para um registro
@@ -62,13 +62,21 @@
     // Desaloca a memória alocada para um registro
     void desalocarRegistro(REGISTRO **registro); 
     // Função auxiliar para recuperar um registro do arquivo binário
-    void recuperarRegistro(REGISTRO **registro, FILE *arquivo, int *maxNomeJog, int *maxNacionalidade, int *maxNomeClube);
+    void recuperarRegistro(REGISTRO **registro, FILE *arquivo, int byteOffset, int *maxNomeJog, int *maxNacionalidade, int *maxNomeClube);
+    // Função auxiliar para recuperar o índice do arquivo, alocando em memória primária
+    REGISTRO_IND *recoverIndex(FILE *arquivo, FILE *indice);
     // Função para processar os comandos de busca
-    void comandoBusca(int *nroComandos, char (*comando)[5][20], char (*palavraChave)[5][100]);
+    int comandoBusca(int *nroComandos, char (*comando)[5][20], char (*palavraChave)[5][100]);
     // Função de buscas nos registros
+<<<<<<< HEAD
     int busca(REGISTRO *registro, int nroComandos, char comando[5][20], char palavraChave[5][100]);
     void lixo (FILE *arquivo);
     void resgatarRegistro(REGISTRO *registro, FILE *arquivo);
+=======
+    int busca(REGISTRO *registro, REGISTRO_IND *vetorInd, int nroComandos, char comando[5][20], char palavraChave[5][100]);
+    // Função para realizar a busca no caso dela utilizar o id
+    long int buscaId(REGISTRO *registro, REGISTRO_IND *vetorInd, int nroRegistros, int nroComandos, char comando[5][20], char palavraChave[5][100]);
+>>>>>>> 1a3903a6909228226bda7be35077e4ad72061f1a
    
 
     // Funções principais
@@ -78,7 +86,7 @@
     // Lista todos os dados de um arquivo de entrada de forma organizada (Funcionalidade 2)
     void selectFrom(char *nomeArquivo);
     // Função que realiza n buscas em um dado arquivo (Funcionalidade 3)
-    void selectFromWhere(char *nomeArquivo, int nroBuscas);
+    void selectFromWhere(char *nomeArquivo, char *nomeIndice, int nroBuscas);
     // Função que cria um índice a partir da chave primária do arquivo de dados (Funcionalidade 4)
     void createIndex(char *nomeArquivo, char *nomeIndice);
     // Função responsável por remover dados de um arquivo (Funcionalidade 5)

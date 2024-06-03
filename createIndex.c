@@ -81,3 +81,33 @@ void createIndex(char *nomeArquivo, char *nomeIndice) {
     fclose(arquivoDados);
     fclose(arquivoIndice);
 }
+
+// Função responsável por recuperar o arquivo de índice da memória secundária e passá-lo
+// para a memória primária
+REGISTRO_IND *recoverIndex(FILE *arquivo, FILE *indice) {
+    int nroRegistros;
+    REGISTRO_IND *registro;
+
+    if ((getc(indice)) == '0') {
+        printf("Falha no processamento do indice.\n");
+        return NULL;
+    }
+
+    // Recuperar o número de registros 
+    fseek(arquivo, 17, SEEK_SET);
+    fread(&nroRegistros, sizeof(int), 1, arquivo);
+
+    registro = malloc(sizeof(REGISTRO_IND) * (nroRegistros + 1));
+        if (registro == NULL) {
+        printf("Erro ao alocar memória.\n");
+        return NULL;
+    }
+
+    // Passar o conteúdo do arquivo índice para a memória primaria
+    for (int i = 0; i < nroRegistros; i++) {
+        fread(&registro[i].id, sizeof(int), 1, indice);
+        fread(&registro[i].byteOffset, sizeof(long int), 1, indice);
+    }
+
+    return(registro);
+}

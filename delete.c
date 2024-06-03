@@ -109,9 +109,15 @@ void deleteFromWhere(char *nomeArquivo, char *nomeIndice, int nroRemocoes) {
     int maxNacionalidade = 30;
     int maxNomeClube = 30;
     
+    int nroRegistros = 0; // Número de registros totais
     int nroRegistrosRemovidos = 0; // Número de registros removidos no arquivo
-    int tamRegRem = 0;
+    int tamRegRem = 0; // Armazena o tamanho do registro a ser removido
+    int idIndex = 0; // Armazena a posição na qual o comando é id, caso exista
     
+    // Cria o arquivo de índice, para uso nas buscas a serem realizadas na função
+    createIndex(nomeArquivo, nomeIndice);
+    
+    // Abertura e testagem do arquivo principal
     FILE *arquivo = NULL; // Ponteiro para o arquivo binário
     if ((arquivo = fopen(nomeArquivo, "r+b")) == NULL) {
         printf("Falha no processamento do arquivo.\n");
@@ -119,46 +125,81 @@ void deleteFromWhere(char *nomeArquivo, char *nomeIndice, int nroRemocoes) {
         exit(1); // Encerra o programa, caso haja falha no processamento
     }
 
+<<<<<<< HEAD
     if (testarArquivo(arquivo, nomeArquivo) == 1)
         exit(1); // Encerra o programa, caso haja falha no processamento 
+=======
+    // Abertura e testagem do arquivo de índice
+    FILE *indice = NULL; // Ponteiro para o arquivo binário
+>>>>>>> 1a3903a6909228226bda7be35077e4ad72061f1a
 
-    // Cria o arquivo de índice, para uso nas buscas a serem realizadas na função
-    createIndex(nomeArquivo, nomeIndice);
+    if ((indice = fopen(nomeIndice, "rb")) == NULL) {
+        printf("Falha no processamento do indice.\n");
+        return;
+    }  
 
     REGISTRO *registro; // Declaração de um ponteiro para o registro
     alocarRegistro(&registro, maxNomeJog, maxNacionalidade, maxNomeClube); // Aloca memória para o registro
 
+<<<<<<< HEAD
    
+=======
+    REGISTRO_IND *vetorInd;
+    vetorInd = recoverIndex(arquivo, indice);
+
+    // Verifica se os arquivos estão integros e se a alocação de registro e vetorInd funcionou
+    if (testarArquivo(arquivo) == 1 || testarArquivo(indice) == 1 || 
+        registro == NULL || vetorInd == NULL) {
+        desalocarRegistro(&registro); // Libera a memória alocada para o registro
+        free(vetorInd);
+        return; // Retorna se houve falha no processamento
+    }
+>>>>>>> 1a3903a6909228226bda7be35077e4ad72061f1a
+
+    // Recuperar número de registros nó arquivo
+    fseek(arquivo, 17, SEEK_SET);
+    fread(&nroRegistros, sizeof(int), 1, arquivo);  
 
     // Loop para realizar as remoções especificadas
     for (int j = 1; j <= nroRemocoes; j++) {
         byteOffset = TAM_CABECALHO; // Reinicia o contador do Byte Offset
 
         fseek(arquivo, byteOffset, SEEK_SET); // Volta ao início do arquivo, após o cabeçalho
-        comandoBusca(&nroComandos, &comando, &palavraChave); // Lê os comandos de busca e as palavras-chave
+        idIndex = comandoBusca(&nroComandos, &comando, &palavraChave); // Lê os comandos de busca e as palavras-chave
+
+        // Trata os casos nos quais a remoção envolvem um id, podendo ser realizadas a partir do arquivo
+        // de índice
+        if (strcmp(comando[idIndex], "id") == 0) {
+            byteOffset = buscaId(registro, vetorInd, nroRegistros, nroComandos, comando, palavraChave);
+            if (byteOffset != -1) {
+                recuperarRegistro(&registro, arquivo, byteOffset, &maxNomeJog, &maxNacionalidade, &maxNomeClube);
+                retornoBusca = busca(registro, vetorInd, nroComandos, comando, palavraChave);
+
+                if (retornoBusca == 0) {
+                    removeRegistro(arquivo, registro, byteOffset); // Imprime os campos do registro
+                    updateList(arquivo, byteOffset, registro->tamanhoRegistro);
+                    // Retornar a posição do arquivo anterior a chamada das funções
+                    fseek(arquivo, byteOffset + registro->tamanhoRegistro, SEEK_SET);
+                    nroRegistrosRemovidos++; // Incrementa o contador de registros encontrados
+                }
+            }
+            continue;
+        }
 
         // Loop para ler e processar os registros do arquivo
-        while ((c = getc(arquivo)) != EOF) { // Lê cada caractere do arquivo até encontrar o final do arquivo (EOF)
-            ungetc(c, arquivo); // Coloca o caractere de volta no buffer do arquivo
-
-            recuperarRegistro(&registro, arquivo, &maxNomeJog, &maxNacionalidade, &maxNomeClube); // Recupera o registro do arquivo
+        while (!feof(arquivo)) { // Lê cada caractere do arquivo até encontrar o final do arquivo (EOF)
+            recuperarRegistro(&registro, arquivo, -1, &maxNomeJog, &maxNacionalidade, &maxNomeClube); // Recupera o registro do arquivo
 
             if (registro->removido == '0') { // Verifica se o registro já foi removido
-                retornoBusca = busca(registro, nroComandos, comando, palavraChave); // Realiza a busca no registro
+                retornoBusca = busca(registro, vetorInd, nroComandos, comando, palavraChave); // Realiza a busca no registro
 
                 // Verifica o resultado da busca e remove o registro se correspondente
                 if (retornoBusca == 0 || retornoBusca == 2) {
                     removeRegistro(arquivo, registro, byteOffset); // Remove o registro
                     updateList(arquivo, byteOffset, registro->tamanhoRegistro);
-
                     // Retornar a posição do arquivo anterior a chamada das funções
-                    fseek(arquivo, byteOffset + registro->tamanhoRegistro, SEEK_SET); 
-                    
+                    fseek(arquivo, byteOffset + registro->tamanhoRegistro, SEEK_SET);     
                     nroRegistrosRemovidos++; // Incrementa o contador de registros removidos
-                    
-                    // Se a busca for pelo ID, interrompe a busca
-                    if (retornoBusca == 2 || retornoBusca == 3)
-                        break;
                 }
             }
             byteOffset += registro->tamanhoRegistro; // Recalcula o novo Byte offset
@@ -170,6 +211,7 @@ void deleteFromWhere(char *nomeArquivo, char *nomeIndice, int nroRemocoes) {
     // Recria o arquivo de índice, de forma a descondiderar os registros removidos durante essa função
     createIndex(nomeArquivo, nomeIndice);
 
+    free(vetorInd);
     desalocarRegistro(&registro); // Libera a memória alocada para o registro
     fclose(arquivo); // Fecha o arquivo após a leitura
 }
