@@ -62,7 +62,7 @@ int main() {
         scanf("%d", &nroRepeticoes); // Recebe o numero de inserções
         insertInto(nomeArquivoBin, nomeIndice, nroRepeticoes); // Chama a função para realizar inserções
     binarioNaTela(nomeArquivoBin);
-        //binarioNaTela(nomeIndice);
+        binarioNaTela(nomeIndice);
     default:
         break;
     }

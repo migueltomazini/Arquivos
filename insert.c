@@ -73,12 +73,13 @@ void preeche_vazio(FILE *arquivo, int tamanho) {
     }
 }
 
-void lixo (FILE *arquivo) {
-    char lixo = 'a';
-    while (lixo != '$' && !feof(arquivo)) {
-        fread(&lixo, sizeof(char), 1, arquivo);
-    }
-    fseek(arquivo, -1, SEEK_CUR);
+void lixo(FILE *file){
+
+    char lixo;
+    do{
+        fread(&lixo, sizeof(char), 1, file);
+    } while (lixo == '$');
+    fseek(file, -1, SEEK_CUR);
 }
 
 void insertIntoAux(char *nomeArquivo) {
@@ -133,6 +134,8 @@ void insertIntoAux(char *nomeArquivo) {
     }
     fseek(nomearq, cabecalho.topo, SEEK_SET);
     resgatarRegistro(anterior, nomearq);
+    lixo(nomearq);
+    
 
     if (anterior->prox == -1) { // se só existe 1 registro removido
         if (registro->tamanhoRegistro <= anterior->tamanhoRegistro) {
@@ -186,6 +189,7 @@ void insertIntoAux(char *nomeArquivo) {
          fseek(nomearq, aux_atual, SEEK_SET);
         REGISTRO* atual = (REGISTRO*) malloc(sizeof(REGISTRO));
         resgatarRegistro(atual, nomearq);
+        lixo(nomearq);
 
         if (registro->tamanhoRegistro <= atual->tamanhoRegistro) {
                             
@@ -213,6 +217,7 @@ void insertIntoAux(char *nomeArquivo) {
         anterior = atual;
         aux_anterior = aux_atual;
         aux_atual = atual->prox;
+      
         
     } 
 
@@ -229,5 +234,5 @@ void insertInto(char *nomeArquivo, char *nomeIndice, int nroAdicoes) {
     for (int i = 0; i < nroAdicoes; i++) {
         insertIntoAux(nomeArquivo);
     }
-    //createIndex(nomeArquivo, nomeIndice);
+    createIndex(nomeArquivo, nomeIndice);
 }

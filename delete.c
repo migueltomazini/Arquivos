@@ -115,11 +115,12 @@ void deleteFromWhere(char *nomeArquivo, char *nomeIndice, int nroRemocoes) {
     FILE *arquivo = NULL; // Ponteiro para o arquivo binário
     if ((arquivo = fopen(nomeArquivo, "r+b")) == NULL) {
         printf("Falha no processamento do arquivo.\n");
-        return;
+
+        exit(1); // Encerra o programa, caso haja falha no processamento
     }
 
     if (testarArquivo(arquivo, nomeArquivo) == 1)
-        return;  
+        exit(1); // Encerra o programa, caso haja falha no processamento 
 
     // Cria o arquivo de índice, para uso nas buscas a serem realizadas na função
     createIndex(nomeArquivo, nomeIndice);
@@ -127,12 +128,7 @@ void deleteFromWhere(char *nomeArquivo, char *nomeIndice, int nroRemocoes) {
     REGISTRO *registro; // Declaração de um ponteiro para o registro
     alocarRegistro(&registro, maxNomeJog, maxNacionalidade, maxNomeClube); // Aloca memória para o registro
 
-    // Verifica se o arquivo foi aberto corretamente e se o processamento falhou
-    if ((arquivo = fopen(nomeArquivo, "r+b")) == NULL 
-         || testarArquivo(arquivo, nomeArquivo) == 1) {
-        desalocarRegistro(&registro); // Libera a memória alocada para o registro
-        return; // Retorna se houve falha no processamento
-    }
+   
 
     // Loop para realizar as remoções especificadas
     for (int j = 1; j <= nroRemocoes; j++) {
