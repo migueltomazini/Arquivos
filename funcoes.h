@@ -51,30 +51,6 @@
     void binarioNaTela(char *nomeArquivoBinario); // Exibe o conteúdo de um arquivo binário na tela
     void scan_quote_string(char *str); // Trata strings com aspas no formato CSV
     
-    // Funções auxiliares 
-
-    // Função auxiliar para abrir e testar o arquivo
-    int testarArquivo(FILE *arquivo); 
-    // Insere um registro no arquivo binário
-    void inserirRegistro(REGISTRO *registro, FILE *arquivo); 
-    // Aloca memória para um registro
-    void alocarRegistro(REGISTRO **registro, int maxNomeJog, int maxNacionalidade, int maxNomeClube); 
-    // Desaloca a memória alocada para um registro
-    void desalocarRegistro(REGISTRO **registro); 
-    // Função auxiliar para recuperar um registro do arquivo binário
-    void recuperarRegistro(REGISTRO **registro, FILE *arquivo, int byteOffset, int *maxNomeJog, int *maxNacionalidade, int *maxNomeClube);
-    // Função auxiliar para recuperar o índice do arquivo, alocando em memória primária
-    REGISTRO_IND *recoverIndex(FILE *arquivo, FILE *indice);
-    // Função para processar os comandos de busca
-    int comandoBusca(int *nroComandos, char (*comando)[5][20], char (*palavraChave)[5][100]);
-    // Função de buscas nos registros
-    int busca(REGISTRO *registro, REGISTRO_IND *vetorInd, int nroComandos, char comando[5][20], char palavraChave[5][100]);
-    void lixo (FILE *arquivo);
-    void resgatarRegistro(REGISTRO *registro, FILE *arquivo);
-    // Função para realizar a busca no caso dela utilizar o id
-    long int buscaId(REGISTRO *registro, REGISTRO_IND *vetorInd, int nroRegistros, int nroComandos, char comando[5][20], char palavraChave[5][100]);
-   
-
     // Funções principais
 
     // Lista o arquivo de saída no modo binário usando a função fornecida binarioNaTela (Funcionalidade 1)

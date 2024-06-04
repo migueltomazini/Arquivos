@@ -1,4 +1,5 @@
 #include "funcoes.h"
+#include "funcoesAuxiliares.h"
 
 // Função responsável pela montagem e inserção do cabeçalho
 void cabecalho(FILE *arquivo, int nroRegArq) {
@@ -27,37 +28,6 @@ void cabecalho(FILE *arquivo, int nroRegArq) {
     free(cabecalho);
 }
 
-// Função auxiliar responsável por alocar memória dinamicamente para o registro
-void alocarRegistro(REGISTRO **registro, int maxNomeJog, int maxNacionalidade, int maxNomeClube) {
-    // Aloca memória para a estrutura REGISTRO
-    *registro = malloc(sizeof(REGISTRO));
-
-    // Verifica se a alocação de memória foi bem-sucedida
-    if (*registro == NULL) 
-        return; // Retorna se não for possível alocar memória
-
-    // Aloca memória para os campos de strings dentro da estrutura REGISTRO
-    (*registro)->nomeJogador = malloc(maxNomeJog * sizeof(char));
-    (*registro)->nomeClube = malloc(maxNacionalidade * sizeof(char));
-    (*registro)->nacionalidade = malloc(maxNomeClube * sizeof(char));
-
-    // Verifica se a alocação de memória foi bem-sucedida para os campos de strings
-    if ((*registro)->nomeJogador == NULL || (*registro)->nomeClube == NULL || 
-        (*registro)->nacionalidade == NULL)
-        return; // Retorna se não for possível alocar memória
-}
-
-// Função auxiliar responsável por desalocar a memória do registro
-void desalocarRegistro(REGISTRO **registro) {
-    // Libera a memória alocada para os campos de strings dentro da estrutura REGISTRO
-    free((*registro)->nomeJogador);
-    free((*registro)->nacionalidade);
-    free((*registro)->nomeClube);
-    // Libera a memória alocada para a estrutura REGISTRO
-    free((*registro));
-    // Define o ponteiro original como NULL
-    *registro = NULL;
-}
 
 // Função responsável pela montagem e inserção dos registros
 void Registro(FILE *dados, FILE *arquivo) {       
@@ -176,25 +146,7 @@ void Registro(FILE *dados, FILE *arquivo) {
     desalocarRegistro(&registro);
 }
 
-// Função responsável por inserir o registro no arquivo binário
-void inserirRegistro(REGISTRO *registro, FILE *arquivo) {
-    // Verifica se o registro ou o arquivo são nulos
-    if (registro == NULL || arquivo == NULL)
-        return; // Retorna se algum dos parâmetros for nulo
 
-    // Escreve os campos do registro no arquivo binário
-    putc(registro->removido, arquivo); // Escreve o campo removido no arquivo
-    fwrite(&registro->tamanhoRegistro, sizeof(int), 1, arquivo); // Escreve o tamanho do registro no arquivo
-    fwrite(&registro->prox, sizeof(long int), 1, arquivo); // Escreve o ponteiro para o próximo registro no arquivo
-    fwrite(&registro->id, sizeof(int), 1, arquivo); // Escreve o ID do jogador no arquivo
-    fwrite(&registro->idade, sizeof(int), 1, arquivo); // Escreve a idade do jogador no arquivo
-    fwrite(&registro->tamNomeJog, sizeof(int), 1, arquivo); // Escreve o tamanho do nome do jogador no arquivo
-    fputs(registro->nomeJogador, arquivo); // Escreve o nome do jogador no arquivo
-    fwrite(&registro->tamNacionalidade, sizeof(int), 1, arquivo); // Escreve o tamanho da nacionalidade no arquivo
-    fputs(registro->nacionalidade, arquivo); // Escreve a nacionalidade no arquivo
-    fwrite(&registro->tamNomeClube, sizeof(int), 1, arquivo); // Escreve o tamanho do nome do clube no arquivo
-    fputs(registro->nomeClube, arquivo); // Escreve o nome do clube no arquivo
-}
 
 // Função responsável por passar os dados do arquivo .csv para o binário
 void createTable(char *nomeArquivoCsv, char *nomeArquivoBin) {

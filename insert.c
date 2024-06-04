@@ -1,238 +1,151 @@
-#include "funcoes.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdbool.h>
+#include "funcoes.h" // Inclui o cabeçalho com as funções principais
+#include "funcoesAuxiliares.h" // Inclui o cabeçalho com as funções auxiliares
 
-void reinserir_cabecalho(FILE *arquivo, CABECALHO *cabecalho, char status) {
-    cabecalho->status = status;
-    fseek(arquivo, 0, SEEK_SET);
-    fwrite(&cabecalho->status, sizeof(char), 1, arquivo);
-    fwrite(&cabecalho->topo, sizeof(long int), 1, arquivo);
-    fwrite(&cabecalho->prosByteOffset, sizeof(long int), 1, arquivo);
-    fwrite(&cabecalho->nroRegArq, sizeof(int), 1, arquivo);
-    fwrite(&cabecalho->nroRegRem, sizeof(int), 1, arquivo);
-}
-
-REGISTRO *criar_registro(int id, int idade, const char *nomeJogador, const char *nacionalidade, const char *clube) {
-    REGISTRO *novoRegistro = (REGISTRO *)malloc(sizeof(REGISTRO));
-    if (!novoRegistro) {
-        printf("Falha no processamento do arquivo.\n");
-        exit(1);
-    }
-
-    novoRegistro->id = id;
-    novoRegistro->idade = idade;
-    novoRegistro->tamNacionalidade = strlen(nacionalidade);
-    novoRegistro->tamNomeJog = strlen(nomeJogador);
-    novoRegistro->tamNomeClube = strlen(clube);
-
-    novoRegistro->nomeJogador = (char *)malloc((novoRegistro->tamNomeJog + 1) * sizeof(char));
-    novoRegistro->nacionalidade = (char *)malloc((novoRegistro->tamNacionalidade + 1) * sizeof(char));
-    novoRegistro->nomeClube = (char *)malloc((novoRegistro->tamNomeClube + 1) * sizeof(char));
-
-    if (!novoRegistro->nomeJogador || !novoRegistro->nacionalidade || !novoRegistro->nomeClube) {
-        printf("Falha no processamento do arquivo.\n");
-        exit(1);
-    }
-
-    strcpy(novoRegistro->nomeJogador, nomeJogador);
-    strcpy(novoRegistro->nacionalidade, nacionalidade);
-    strcpy(novoRegistro->nomeClube, clube);
-
-    novoRegistro->tamanhoRegistro = 33 + novoRegistro->tamNomeJog + novoRegistro->tamNomeClube + novoRegistro->tamNacionalidade;
-    novoRegistro->removido = '0';
-    novoRegistro->prox = -1;
-
-    return novoRegistro;
-}
-
-void resgatarRegistro(REGISTRO *registro, FILE *arquivo) {
-    fread(&registro->removido, sizeof(char), 1, arquivo);
-    fread(&registro->tamanhoRegistro, sizeof(int), 1, arquivo);
-    fread(&registro->prox, sizeof(long int), 1, arquivo);
-    fread(&registro->id, sizeof(int), 1, arquivo);
-    fread(&registro->idade, sizeof(int), 1, arquivo);
-    fread(&registro->tamNomeJog, sizeof(int), 1, arquivo);
-    registro->nomeJogador = (char *)malloc((registro->tamNomeJog + 1) * sizeof(char));
-    fread(registro->nomeJogador, sizeof(char), registro->tamNomeJog, arquivo);
-    registro->nomeJogador[registro->tamNomeJog] = '\0';
-    fread(&registro->tamNacionalidade, sizeof(int), 1, arquivo);
-    registro->nacionalidade = (char *)malloc((registro->tamNacionalidade + 1) * sizeof(char));
-    fread(registro->nacionalidade, sizeof(char), registro->tamNacionalidade, arquivo);
-    registro->nacionalidade[registro->tamNacionalidade] = '\0';
-    fread(&registro->tamNomeClube, sizeof(int), 1, arquivo);
-    registro->nomeClube = (char *)malloc((registro->tamNomeClube + 1) * sizeof(char));
-    fread(registro->nomeClube, sizeof(char), registro->tamNomeClube, arquivo);
-    registro->nomeClube[registro->tamNomeClube] = '\0';
-}
-
-void preeche_vazio(FILE *arquivo, int tamanho) {
-    for (int i = 0; i < tamanho; i++) {
-        fwrite("$", sizeof(char), 1, arquivo);
-    }
-}
-
-void lixo(FILE *file){
-
-    char lixo;
-    do{
-        fread(&lixo, sizeof(char), 1, file);
-    } while (lixo == '$');
-    fseek(file, -1, SEEK_CUR);
-}
-
+// Função auxiliar para inserir um registro no arquivo
 void insertIntoAux(char *nomeArquivo) {
     int id, idade; 
     char nomeJogador[30], nacionalidade[30], nomeClube[30], auxIdade[4];
 
+    // Lê os dados do registro a partir da entrada padrão
     scanf("%d", &id);
     scan_quote_string(auxIdade);
     scan_quote_string(nomeJogador);
     scan_quote_string(nacionalidade);
     scan_quote_string(nomeClube);
-    idade = atoi(auxIdade);
-    if (idade == 0) {
+    idade = atoi(auxIdade); // Converte a idade de string para inteiro
+    if (idade == 0) { // Se a idade for 0, define como -1 (indefinida)
         idade = -1;
     }
 
+    // Abre o arquivo binário para leitura e escrita
     FILE* nomearq = fopen(nomeArquivo, "rb+");
-    if (nomearq == NULL) {
+    if (nomearq == NULL) { // Verifica se a abertura do arquivo falhou
         printf("Falha no processamento do arquivo\n");
         exit(1);
     }
 
-    CABECALHO cabecalho;
-    fread(&cabecalho.status, sizeof(char), 1, nomearq);
-    fread(&cabecalho.topo, sizeof(long int), 1, nomearq);
-    fread(&cabecalho.prosByteOffset, sizeof(long int), 1, nomearq);
-    fread(&cabecalho.nroRegArq, sizeof(int), 1, nomearq);
-    fread(&cabecalho.nroRegRem, sizeof(int), 1, nomearq);
+    CABECALHO cabecalho; // Declaração do cabeçalho do arquivo
+    ler_cabecalho(nomearq, &cabecalho); // Lê o cabeçalho do arquivo
 
-    if (cabecalho.status == '0') {
+    if (cabecalho.status == '0') { // Verifica se o status do cabeçalho é inválido
         printf("Falha no processamento do arquivo\n");
-        fclose(nomearq);
+        fclose(nomearq); // Fecha o arquivo
         exit(1);
     }
 
-    REGISTRO* registro = criar_registro(id, idade, nomeJogador, nacionalidade, nomeClube);
-    if (cabecalho.topo == -1) { // não tem registros removidos
-        fseek(nomearq, 0, SEEK_END);
-        inserirRegistro(registro, nomearq);
-        cabecalho.prosByteOffset += registro->tamanhoRegistro;
-        cabecalho.nroRegArq++;
-        desalocarRegistro(&registro);
-        reinserir_cabecalho(nomearq, &cabecalho, '1');
-        fclose(nomearq);
+    reinserir_cabecalho(nomearq, &cabecalho, '0'); // Atualiza o status do cabeçalho para '0' (inválido)
+
+    REGISTRO* registro = criar_registro(id, idade, nomeJogador, nacionalidade, nomeClube); // Cria um novo registro
+    if (cabecalho.topo == -1) { // Se não há registros removidos
+        fseek(nomearq, 0, SEEK_END); // Posiciona o ponteiro no final do arquivo
+        inserirRegistro(registro, nomearq); // Insere o novo registro no final do arquivo
+        cabecalho.prosByteOffset += registro->tamanhoRegistro; // Atualiza o próximo byte offset
+        cabecalho.nroRegArq++; // Incrementa o número de registros
+        desalocarRegistro(&registro); // Desaloca a memória do registro
+        reinserir_cabecalho(nomearq, &cabecalho, '1'); // Atualiza o cabeçalho com o status '1' (válido)
+        fclose(nomearq); // Fecha o arquivo
         return;
-    } 
+    }
 
-    REGISTRO* anterior = (REGISTRO*) malloc(sizeof(REGISTRO));
-    if (!anterior) {
+    REGISTRO* anterior = (REGISTRO*) malloc(sizeof(REGISTRO)); // Aloca memória para o registro anterior
+    if (!anterior) { // Verifica se a alocação de memória falhou
         printf("Falha no processamento do arquivo.\n");
         exit(1);
     }
-    fseek(nomearq, cabecalho.topo, SEEK_SET);
-    resgatarRegistro(anterior, nomearq);
-    lixo(nomearq);
-    
+    fseek(nomearq, cabecalho.topo, SEEK_SET); // Posiciona o ponteiro no topo da lista de registros removidos
+    ler_registro(anterior, nomearq); // Lê o registro anterior
+    ler_lixo(nomearq); // Lê os espaços vazios após o registro anterior
 
-    if (anterior->prox == -1) { // se só existe 1 registro removido
-        if (registro->tamanhoRegistro <= anterior->tamanhoRegistro) {
-            fseek(nomearq, (-1) * anterior->tamanhoRegistro, SEEK_CUR);
+    if (anterior->prox == -1) { // Se só existe um registro removido
+        if (registro->tamanhoRegistro <= anterior->tamanhoRegistro) { // Se o tamanho do novo registro é menor ou igual ao registro removido
+            fseek(nomearq, (-1) * anterior->tamanhoRegistro, SEEK_CUR); // Posiciona o ponteiro no início do registro removido
             int tamaux = registro->tamanhoRegistro;
-            registro->tamanhoRegistro = anterior->tamanhoRegistro;
-            inserirRegistro(registro, nomearq);
-            preeche_vazio(nomearq, anterior->tamanhoRegistro - tamaux);
-            cabecalho.topo = -1;
-            cabecalho.nroRegRem--;
-            cabecalho.nroRegArq++;
-            reinserir_cabecalho(nomearq, &cabecalho, '1');
-            desalocarRegistro(&anterior);
-            desalocarRegistro(&registro);
-            fclose(nomearq);
+            registro->tamanhoRegistro = anterior->tamanhoRegistro; // Atualiza o tamanho do novo registro para ocupar o espaço do registro removido
+            inserirRegistro(registro, nomearq); // Insere o novo registro no lugar do registro removido
+            preeche_vazio(nomearq, anterior->tamanhoRegistro - tamaux); // Preenche o espaço vazio, se houver
+            cabecalho.topo = -1; // Atualiza o topo para indicar que não há mais registros removidos
+            cabecalho.nroRegRem--; // Decrementa o número de registros removidos
+            cabecalho.nroRegArq++; // Incrementa o número de registros
+            reinserir_cabecalho(nomearq, &cabecalho, '1'); // Atualiza o cabeçalho com o status '1' (válido)
+            desalocarRegistro(&anterior); // Desaloca a memória do registro anterior
+            desalocarRegistro(&registro); // Desaloca a memória do novo registro
+            fclose(nomearq); // Fecha o arquivo
             return;
-        } else { // insere no fim
-            fseek(nomearq, 0, SEEK_END);
-            inserirRegistro(registro, nomearq);
-            cabecalho.prosByteOffset += registro->tamanhoRegistro;
-            cabecalho.nroRegArq++;
-            desalocarRegistro(&registro);
-            reinserir_cabecalho(nomearq, &cabecalho, '1');
-            fclose(nomearq);
+        } else { // Se o tamanho do novo registro é maior que o registro removido
+            fseek(nomearq, 0, SEEK_END); // Posiciona o ponteiro no final do arquivo
+            inserirRegistro(registro, nomearq); // Insere o novo registro no final do arquivo
+            cabecalho.prosByteOffset += registro->tamanhoRegistro; // Atualiza o próximo byte offset
+            cabecalho.nroRegArq++; // Incrementa o número de registros
+            desalocarRegistro(&registro); // Desaloca a memória do novo registro
+            reinserir_cabecalho(nomearq, &cabecalho, '1'); // Atualiza o cabeçalho com o status '1' (válido)
+            fclose(nomearq); // Fecha o arquivo
             return;
         }
-    } else if (registro->tamanhoRegistro <= anterior->tamanhoRegistro) { // se for o primeiro
-        fseek(nomearq, (-1) * anterior->tamanhoRegistro, SEEK_CUR);
+    } else if (registro->tamanhoRegistro <= anterior->tamanhoRegistro) { // Se o novo registro deve ser inserido no topo
+        fseek(nomearq, (-1) * anterior->tamanhoRegistro, SEEK_CUR); // Posiciona o ponteiro no início do registro removido
         int tamaux = registro->tamanhoRegistro;
-        registro->tamanhoRegistro = anterior->tamanhoRegistro;
-        inserirRegistro(registro, nomearq);
-        preeche_vazio(nomearq, anterior->tamanhoRegistro - tamaux);
-        cabecalho.topo = anterior->prox;
-        cabecalho.nroRegRem--;
-        cabecalho.nroRegArq++;
-        reinserir_cabecalho(nomearq, &cabecalho, '1');
-        desalocarRegistro(&anterior);
-        desalocarRegistro(&registro);
-        fclose(nomearq);
+        registro->tamanhoRegistro = anterior->tamanhoRegistro; // Atualiza o tamanho do novo registro para ocupar o espaço do registro removido
+        inserirRegistro(registro, nomearq); // Insere o novo registro no lugar do registro removido
+        preeche_vazio(nomearq, anterior->tamanhoRegistro - tamaux); // Preenche o espaço vazio, se houver
+        cabecalho.topo = anterior->prox; // Atualiza o topo para o próximo registro removido
+        cabecalho.nroRegRem--; // Decrementa o número de registros removidos
+        cabecalho.nroRegArq++; // Incrementa o número de registros
+        reinserir_cabecalho(nomearq, &cabecalho, '1'); // Atualiza o cabeçalho com o status '1' (válido)
+        desalocarRegistro(&anterior); // Desaloca a memória do registro anterior
+        desalocarRegistro(&registro); // Desaloca a memória do novo registro
+        fclose(nomearq); // Fecha o arquivo
         return;
     }
 
-    long int aux_anterior = cabecalho.topo; // anterior da onde eu quero inserir
-    long int aux_atual = anterior->prox; // aonde eu quero inserir
-    while (aux_atual != -1) { // pula o primeiro pq tratamos antes
-        /* existe tres casos:
-        1- só tem um removido (feita acima)
-        2- inserção no início (feita acima)
-        3- inserção no meio (feita abaixo)
-        4- chegou ao fim */
-         fseek(nomearq, aux_atual, SEEK_SET);
-        REGISTRO* atual = (REGISTRO*) malloc(sizeof(REGISTRO));
-        resgatarRegistro(atual, nomearq);
-        lixo(nomearq);
+    long int aux_anterior = cabecalho.topo; // Byte offset do registro anterior ao atual
+    long int aux_atual = anterior->prox; // Byte offset do próximo registro a ser processado
+    while (aux_atual != -1) { // Percorre a lista de registros removidos
+        fseek(nomearq, aux_atual, SEEK_SET); // Posiciona o ponteiro no próximo registro removido
+        REGISTRO* atual = (REGISTRO*) malloc(sizeof(REGISTRO)); // Aloca memória para o registro atual
+        ler_registro(atual, nomearq); // Lê o registro atual
+        ler_lixo(nomearq); // Lê os espaços vazios após o registro atual
 
-        if (registro->tamanhoRegistro <= atual->tamanhoRegistro) {
-                            
-              anterior->prox = atual->prox;
-            fseek(nomearq, (-1) * atual->tamanhoRegistro, SEEK_CUR);
+        if (registro->tamanhoRegistro <= atual->tamanhoRegistro) { // Se o novo registro deve ser inserido no lugar do registro atual
+            anterior->prox = atual->prox; // Atualiza o ponteiro do registro anterior para pular o registro atual
+            fseek(nomearq, (-1) * atual->tamanhoRegistro, SEEK_CUR); // Posiciona o ponteiro no início do registro atual
             int tamaux = registro->tamanhoRegistro;
-            registro->tamanhoRegistro = atual->tamanhoRegistro;
-            inserirRegistro(registro, nomearq);
-            preeche_vazio(nomearq, atual->tamanhoRegistro - tamaux);
-            cabecalho.nroRegRem--;
-            cabecalho.nroRegArq++;
-            fseek(nomearq, aux_anterior, SEEK_SET);
-            inserirRegistro(anterior, nomearq);
-            
-        
-            
-            reinserir_cabecalho(nomearq, &cabecalho, '1');
-            desalocarRegistro(&atual);
-            desalocarRegistro(&anterior);
-            desalocarRegistro(&registro);
-            fclose(nomearq);
-            return; 
+            registro->tamanhoRegistro = atual->tamanhoRegistro; // Atualiza o tamanho do novo registro para ocupar o espaço do registro atual
+            inserirRegistro(registro, nomearq); // Insere o novo registro no lugar do registro atual
+            preeche_vazio(nomearq, atual->tamanhoRegistro - tamaux); // Preenche o espaço vazio, se houver
+            cabecalho.nroRegRem--; // Decrementa o número de registros removidos
+            cabecalho.nroRegArq++; // Incrementa o número de registros
+            fseek(nomearq, aux_anterior, SEEK_SET); // Posiciona o ponteiro no registro anterior
+            inserirRegistro(anterior, nomearq); // Atualiza o registro anterior no arquivo
+            reinserir_cabecalho(nomearq, &cabecalho, '1'); // Atualiza o cabeçalho com o status '1' (válido)
+            desalocarRegistro(&atual); // Desaloca a memória do registro atual
+            desalocarRegistro(&anterior); // Desaloca a memória do registro anterior
+            desalocarRegistro(&registro); // Desaloca a memória do novo registro
+            fclose(nomearq); // Fecha o arquivo
+            return;
         }
-                 
-        anterior = atual;
-        aux_anterior = aux_atual;
-        aux_atual = atual->prox;
-      
-        
-    } 
 
+        anterior = atual; // Atualiza o registro anterior para o próximo
+        aux_anterior = aux_atual; // Atualiza o byte offset do registro anterior
+        aux_atual = atual->prox; // Atualiza o byte offset do próximo registro a ser processado
+    }
+
+    // Insere o novo registro no final do arquivo
     fseek(nomearq, 0, SEEK_END);
     inserirRegistro(registro, nomearq);
-    cabecalho.nroRegArq++;
-    cabecalho.prosByteOffset += registro->tamanhoRegistro;
-    reinserir_cabecalho(nomearq, &cabecalho, '1');
-    desalocarRegistro(&registro);
-    fclose(nomearq);
+    cabecalho.nroRegArq++; // Incrementa o número de registros
+    cabecalho.prosByteOffset += registro->tamanhoRegistro; // Atualiza o próximo byte offset
+    reinserir_cabecalho(nomearq, &cabecalho, '1'); // Atualiza o cabeçalho com o status '1' (válido)
+    desalocarRegistro(&registro); // Desaloca a memória do novo registro
+    fclose(nomearq); // Fecha o arquivo
 }
 
+// Função principal para inserir múltiplos registros no arquivo
 void insertInto(char *nomeArquivo, char *nomeIndice, int nroAdicoes) {
     for (int i = 0; i < nroAdicoes; i++) {
-        insertIntoAux(nomeArquivo);
+        insertIntoAux(nomeArquivo); // Insere cada registro utilizando a função auxiliar
     }
-    createIndex(nomeArquivo, nomeIndice);
+    createIndex(nomeArquivo, nomeIndice); // Recria o índice após as inserções
 }
+
+
+
