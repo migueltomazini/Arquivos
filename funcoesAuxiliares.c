@@ -188,6 +188,7 @@ int testarArquivo(FILE *arquivo) {
         printf("Falha no processamento do arquivo.\n"); // Imprime mensagem de erro
         return 1; // Retorna 1 para indicar falha
     }
+    fseek(arquivo, 0, SEEK_SET);
     return 0; // Retorna 0 para indicar sucesso
 }
 

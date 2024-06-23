@@ -44,26 +44,29 @@ int main() {
         scanf(" %s", nomeArquivoBin); // Recebe o nome do arquivo
         scanf(" %s", nomeIndice); // Recebe o nome do índice
         createIndex(nomeArquivoBin, nomeIndice); // Chama a função para criar o índice
-        //binarioNaTela(nomeArquivoBin); // Exibe o conteúdo do índice na tela
-        binarioNaTela(nomeIndice);
+        binarioNaTela(nomeIndice); // Exibe o conteúdo do índice na tela
         break;
     case 5:
         scanf(" %s", nomeArquivoBin); // Recebe o nome do arquivo
         scanf(" %s", nomeIndice); // Recebe o nome do índice
         scanf("%d", &nroRepeticoes); // Recebe o numero de remoções
-        //selectFromWhere(nomeArquivoBin, nroRepeticoes);
         deleteFromWhere(nomeArquivoBin, nomeIndice, nroRepeticoes); // Chama a função para realizar remoções
         binarioNaTela(nomeArquivoBin);
         binarioNaTela(nomeIndice);
         break;
-
     case 6:
         scanf(" %s", nomeArquivoBin); // Recebe o nome do arquivo
         scanf(" %s", nomeIndice); // Recebe o nome do índice
         scanf("%d", &nroRepeticoes); // Recebe o numero de inserções
         insertInto(nomeArquivoBin, nomeIndice, nroRepeticoes); // Chama a função para realizar inserções
-    binarioNaTela(nomeArquivoBin);
+        binarioNaTela(nomeArquivoBin);
         binarioNaTela(nomeIndice);
+    case 7:
+        scanf(" %s", nomeArquivoBin); // Recebe o nome do arquivo
+        scanf(" %s", nomeIndice); // Recebe o nome do índice
+        createBTreeIndex(nomeArquivoBin, nomeIndice); // Chama a função para criar o índice
+        binarioNaTela(nomeIndice); // Exibe o conteúdo do índice na tela
+        break;
     default:
         break;
     }

@@ -44,7 +44,7 @@
 
     struct registro_ind_ {
         int id;                     // ID do registro
-        long int byteOffset;             // Byte offset do registro de dados referente ao id
+        long int byteOffset;        // Byte offset do registro de dados referente ao id
     };
 
     // Funções fornecidas
@@ -65,5 +65,9 @@
     void deleteFromWhere(char *nomeArquivo, char *nomeIndice, int nroRemocoes);
     // Função responsável por inserir dados em um arquivo (Funcionalidade 6)
     void insertInto(char *nomeArquivo, char *nomeIndice, int nroAdicoes);
+    // Função responsável por criar um arquivo de índice com Árvore B a partir da chave primária de dados (Funcionalidade 7)
+    void createBTreeIndex(char *nomeArquivo, char *nomeIndice);
+    // Função para realizar n buscas a partir do ID, utilizando o arquivo de índice em árvore B (Funcionalidade 8)
+    void selectFromId(char *nomeArquivo, char *nomeIndice, int nroBuscas);
     
 #endif // FUNCOES_H
