@@ -14,6 +14,8 @@ int main() {
     inserirChave(&arvore, "arvoreB.bin", 25, 250);
     inserirChave(&arvore, "arvoreB.bin", 30, 300);
 
+    recuperarCabacalhoArvB(fopen("arvoreB.bin", "rb"), &arvore);
+
     // Busca por algumas chaves na árvore B e imprime os resultados
     long result = buscarChave(&arvore, fopen("arvoreB.bin", "rb"), arvore.noRaiz, 10);
     if (result != -1) {

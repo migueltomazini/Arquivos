@@ -30,6 +30,7 @@
 
     void criarNo(NO_BTREE *no);
     void inserirCabecalhoArvB (FILE *arquivo, CABECALHO_BTREE *cabecalho);
+    void recuperarCabacalhoArvB (FILE *arquivo, CABECALHO_BTREE *cabecalho);
     void escreverNo(FILE * arquivo, long rrn, NO_BTREE *no);
     void recuperarNo(FILE * arquivo, long rrn, NO_BTREE *no);
     void inicializarArvoreB(CABECALHO_BTREE *arvore, const char *nomeArquivo);

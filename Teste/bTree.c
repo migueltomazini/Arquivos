@@ -10,6 +10,7 @@ void criarNo(NO_BTREE *no) {
         no->byteOffset[i] = -1;
         no->ponteiroNo[i] = -1;
     }
+    no->rrn = -1;
 }
 
 // Escreve o cabeçalho da árvore B no início do arquivo.
@@ -22,19 +23,12 @@ void inserirCabecalhoArvB (FILE *arquivo, CABECALHO_BTREE *cabecalho) {
 }
 
 // Lê o cabeçalho da árvore B a partir do arquivo e retorna um ponteiro para ele.
-CABECALHO_BTREE *recuperarCabacalhoArvB (FILE *arquivo) {
-    // Criar e alocar o cabeçalho do arquivo da Árvore B
-    CABECALHO_BTREE *cabecalho;
-    if ((cabecalho = malloc(sizeof(CABECALHO_BTREE))) == NULL)
-        return NULL;
-
+void recuperarCabacalhoArvB (FILE *arquivo, CABECALHO_BTREE *cabecalho) {
     fseek(arquivo, 0, SEEK_SET);
     fread(&(cabecalho->status), sizeof(char), 1, arquivo);
     fread(&(cabecalho->noRaiz), sizeof(int), 1, arquivo);
     fread(&(cabecalho->proxRRN), sizeof(int), 1, arquivo);
     fread(&(cabecalho->nroChaves), sizeof(int), 1, arquivo);
-
-    return cabecalho;
 }
 
 // Escreve um nó da árvore B em uma posição específica no arquivo. 
@@ -217,7 +211,7 @@ void inserirChave(CABECALHO_BTREE *arvore, const char *nomeArquivo, int chave, l
     // if (testarArquivo(arquivo) == 1)
     //     exit(1); 
 
-    arvore = recuperarCabacalhoArvB(arquivo);
+    recuperarCabacalhoArvB(arquivo, arvore);
     arvore->status = '0';
     fseek(arquivo, 0, SEEK_SET);
     fwrite(&arvore->status, sizeof(char), 1, arquivo);
@@ -242,17 +236,17 @@ void inserirChave(CABECALHO_BTREE *arvore, const char *nomeArquivo, int chave, l
     } 
     // Caso no qual é necessário criar uma nova raiz, devido a promoção
     else if (retorno == 1) {
-        NO_BTREE novaRaiz;
-        criarNo(&novaRaiz);
-        novaRaiz.alturaNo = arvore->noRaiz == -1 ? 0 : (arvore->noRaiz + 1);
-        novaRaiz.nroChaves = 1;
-        novaRaiz.chaves[0] = chavePromovida;
-        novaRaiz.byteOffset[0] = byteOffsetPromovido;
-        novaRaiz.ponteiroNo[0] = arvore->noRaiz;
-        novaRaiz.ponteiroNo[1] = descendenteDireita;
-        novaRaiz.rrn = arvore->proxRRN++;
-        arvore->noRaiz = novaRaiz.rrn;
-        escreverNo(arquivo, novaRaiz.rrn, &novaRaiz);
+        NO_BTREE novoNo;
+        criarNo(&novoNo);
+        novoNo.alturaNo = arvore->noRaiz == -1 ? 0 : (arvore->noRaiz + 1);
+        novoNo.nroChaves = 1;
+        novoNo.chaves[0] = chavePromovida;
+        novoNo.byteOffset[0] = byteOffsetPromovido;
+        novoNo.ponteiroNo[0] = arvore->noRaiz;
+        novoNo.ponteiroNo[1] = descendenteDireita;
+        novoNo.rrn = arvore->proxRRN++;
+        arvore->noRaiz = novoNo.rrn;
+        escreverNo(arquivo, novoNo.rrn, &novoNo);
     }
 
     arvore->nroChaves++;
@@ -306,13 +300,13 @@ void printRaiz(CABECALHO_BTREE * arvore, FILE * arquivo) {
 // Ajeitar
 // Função responsável por buscar uma determinada chave na árvore B.
 long buscarChave(CABECALHO_BTREE *arvore, FILE *arquivo, long rrn, int chave) {
+    int i = 0;
     NO_BTREE no;
+
     recuperarNo(arquivo, rrn, &no);
 
-    int i = 0;
-    while (i < no.nroChaves && chave > no.chaves[i]) {
-        i++;
-    }
+    for (; i < no.nroChaves && chave > no.chaves[i]; i++);
+    
     if (i < no.nroChaves && chave == no.chaves[i]) {
         return no.byteOffset[i]; // Chave encontrada
     } else if (no.alturaNo == 0) {
