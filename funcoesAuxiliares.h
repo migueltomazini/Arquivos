@@ -23,7 +23,7 @@ void ler_registro(REGISTRO *registro, FILE *arquivo);
 void preeche_vazio(FILE *arquivo, int tamanho);
 
 // Função para ler lixo do arquivo
-void ler_lixo(FILE *file);
+int ler_lixo(FILE *file);
 
 // Função para atualizar a lista encadeada de registros removidos
 void updateList(FILE *arquivo, long int novo, int tamanhoRegistroNovo);

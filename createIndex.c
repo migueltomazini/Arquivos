@@ -78,26 +78,3 @@ void createIndex(char *nomeArquivo, char *nomeIndice) {
     fclose(arquivoDados); // Fecha o arquivo de dados
     fclose(arquivoIndice); // Fecha o arquivo de índice
 }
-
-void createBTreeIndex(char *nomeArquivo, char *nomeIndice) {
-        FILE *arquivoDados = fopen(nomeArquivo, "rb"); // Abre o arquivo de dados para leitura binária
-    if (arquivoDados == NULL) { // Verifica se a abertura do arquivo falhou
-        printf("Falha no processamento do arquivo.\n"); // Imprime mensagem de erro
-        exit(1); // Encerra o programa com erro
-    }
-
-    CABECALHO cabecalho; // Declaração do cabeçalho do arquivo de dados
-    ler_cabecalho(arquivoDados, &cabecalho); // Lê o cabeçalho do arquivo de dados
-    if (cabecalho.status == '0') { // Verifica se o status do cabeçalho é inválido
-        printf("Falha no processamento do arquivo.\n"); // Imprime mensagem de erro
-        fclose(arquivoDados); // Fecha o arquivo de dados
-        exit(0); // Encerra o programa com erro
-    }
-
-    FILE *arquivoIndice = fopen(nomeIndice, "wb"); // Abre o arquivo de índice para escrita binária
-    if (arquivoIndice == NULL) { // Verifica se a abertura do arquivo falhou
-        printf("Falha no processamento do arquivo.\n"); // Imprime mensagem de erro
-        fclose(arquivoDados); // Fecha o arquivo de dados
-        exit(1); // Encerra o programa com erro
-    }
-}

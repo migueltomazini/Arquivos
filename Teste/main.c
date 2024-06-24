@@ -1,10 +1,11 @@
 #include "bTree.h"
 
 int main() {
-    CABECALHO_BTREE arvore;
+    BTREE arvore;
 
     // Inicializa a árvore B e cria o arquivo de dados
     inicializarArvoreB(&arvore, "arvoreB.bin");
+    // FILE *arquivo = fopen("arvoreB.bin", "wb");
 
     // Insere algumas chaves na árvore B
     inserirChave(&arvore, "arvoreB.bin", 10, 100);

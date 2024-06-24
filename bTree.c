@@ -14,7 +14,7 @@ void criarNo(NO_BTREE *no) {
 }
 
 // Escreve o cabeçalho da árvore B no início do arquivo.
-void inserirCabecalhoArvB (FILE *arquivo, CABECALHO_BTREE *cabecalho) {
+void inserirCabecalhoArvB (FILE *arquivo, BTREE *cabecalho) {
     fseek(arquivo, 0, SEEK_SET);
     fwrite(&(cabecalho->status), sizeof(char), 1, arquivo);
     fwrite(&(cabecalho->noRaiz), sizeof(int), 1, arquivo);
@@ -23,7 +23,7 @@ void inserirCabecalhoArvB (FILE *arquivo, CABECALHO_BTREE *cabecalho) {
 }
 
 // Lê o cabeçalho da árvore B a partir do arquivo e retorna um ponteiro para ele.
-void recuperarCabacalhoArvB (FILE *arquivo, CABECALHO_BTREE *cabecalho) {
+void recuperarCabacalhoArvB (FILE *arquivo, BTREE *cabecalho) {
     fseek(arquivo, 0, SEEK_SET);
     fread(&(cabecalho->status), sizeof(char), 1, arquivo);
     fread(&(cabecalho->noRaiz), sizeof(int), 1, arquivo);
@@ -59,7 +59,7 @@ void recuperarNo(FILE * arquivo, long rrn, NO_BTREE *no) {
 }
 
 // Inicializa uma árvore B, criando um novo arquivo para armazená-la.
-void inicializarArvoreB(CABECALHO_BTREE *arvore, const char *nomeArquivo) {
+void inicializarArvoreB(BTREE *arvore, const char *nomeArquivo) {
     FILE *arquivo = fopen(nomeArquivo, "wb");
     if (arquivo == NULL) {
         perror("Erro ao abrir arquivo");
@@ -136,7 +136,7 @@ void dividirNo(int chave, long byteOffset, NO_BTREE *no, int *chavePromovida, lo
 }
 
 // Função responsável por inserir chaves de forma recursiva
-int inserirChaveRecursivo(FILE *arquivo, CABECALHO_BTREE *arvore, int rrnAtual, int chave, long byteOffset, int *chavePromovida, long *byteOffsetPromovido, int *descendenteDireita) {
+int inserirChaveRecursivo(FILE *arquivo, BTREE *arvore, int rrnAtual, int chave, long byteOffset, int *chavePromovida, long *byteOffsetPromovido, int *descendenteDireita) {
     // Caso base: Nó inexistente, indicando necessidade de promoção do anterior
     if (rrnAtual == -1) {
         *chavePromovida = chave;
@@ -197,7 +197,7 @@ int inserirChaveRecursivo(FILE *arquivo, CABECALHO_BTREE *arvore, int rrnAtual, 
 }
 
 // Função responsável por inserir uma chave na árvore B.
-void inserirChave(CABECALHO_BTREE *arvore, const char *nomeArquivo, int chave, long byteOffset) {
+void inserirChave(BTREE *arvore, const char *nomeArquivo, int chave, long byteOffset) {
     int chavePromovida;         // Chave a ser promovida caso um split seja necessário
     long byteOffsetPromovido;   // ByteOffset da chave promovida
     int descendenteDireita;
@@ -257,7 +257,7 @@ void inserirChave(CABECALHO_BTREE *arvore, const char *nomeArquivo, int chave, l
 }
 
 // Função responsável pela impressão dos descendentes -- APAGAR DEPOIS
-void printDescendente(CABECALHO_BTREE * arvore, int rrn, FILE * arquivo) {
+void printDescendente(BTREE * arvore, int rrn, FILE * arquivo) {
     NO_BTREE no;
     criarNo(&no);
 
@@ -274,7 +274,7 @@ void printDescendente(CABECALHO_BTREE * arvore, int rrn, FILE * arquivo) {
 }
 
 // Função responsável pela impressão da raiz -- APAGAR DEPOIS
-void printRaiz(CABECALHO_BTREE * arvore, FILE * arquivo) {
+void printRaiz(BTREE * arvore, FILE * arquivo) {
     NO_BTREE no;
     criarNo(&no);
 
@@ -299,7 +299,7 @@ void printRaiz(CABECALHO_BTREE * arvore, FILE * arquivo) {
 
 // Ajeitar
 // Função responsável por buscar uma determinada chave na árvore B.
-long buscarChave(CABECALHO_BTREE *arvore, FILE *arquivo, long rrn, int chave) {
+long buscarChave(BTREE *arvore, FILE *arquivo, long rrn, int chave) {
     int i = 0;
     NO_BTREE no;
 

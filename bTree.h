@@ -9,7 +9,7 @@
     #define TAM_PAG 60
 
     // Definição das estruturas CABECALHO e NO da árvore binária
-    typedef struct cabecalho_btree_ CABECALHO_BTREE;
+    typedef struct cabecalho_btree_ BTREE;
     typedef struct no_btree_ NO_BTREE;
 
     struct cabecalho_btree_ {
@@ -29,16 +29,16 @@
     };   
 
     void criarNo(NO_BTREE *no);
-    void inserirCabecalhoArvB (FILE *arquivo, CABECALHO_BTREE *cabecalho);
-    void recuperarCabacalhoArvB (FILE *arquivo, CABECALHO_BTREE *cabecalho);
+    void inserirCabecalhoArvB (FILE *arquivo, BTREE *cabecalho);
+    void recuperarCabacalhoArvB (FILE *arquivo, BTREE *cabecalho);
     void escreverNo(FILE * arquivo, long rrn, NO_BTREE *no);
     void recuperarNo(FILE * arquivo, long rrn, NO_BTREE *no);
-    void inicializarArvoreB(CABECALHO_BTREE *arvore, const char *nomeArquivo);
+    void inicializarArvoreB(BTREE *arvore, const char *nomeArquivo);
     void dividirNo(int chave, long byteOffset, NO_BTREE *no, int *chavePromovida, long *byteOffsetPromovido, int *descendenteDireita, NO_BTREE *novoNoDireita);
-    int inserirChaveRecursivo(FILE *arquivo, CABECALHO_BTREE *arvore, int rrnAtual, int chave, long byteOffset, int *promoKey, long *promoOffset, int *promoRChild);
-    void printDescendente(CABECALHO_BTREE * arvore, int rrn, FILE * arquivo);
-    void printRaiz(CABECALHO_BTREE * arvore, FILE * arquivo);
-    void inserirChave(CABECALHO_BTREE *arvore, const char *nomeArquivo, int chave, long byteOffset);
-    long buscarChave(CABECALHO_BTREE *arvore, FILE *arquivo, long rrn, int chave);
+    int inserirChaveRecursivo(FILE *arquivo, BTREE *arvore, int rrnAtual, int chave, long byteOffset, int *promoKey, long *promoOffset, int *promoRChild);
+    void printDescendente(BTREE * arvore, int rrn, FILE * arquivo);
+    void printRaiz(BTREE * arvore, FILE * arquivo);
+    void inserirChave(BTREE *arvore, const char *nomeArquivo, int chave, long byteOffset);
+    long buscarChave(BTREE *arvore, FILE *arquivo, long rrn, int chave);
     
 #endif

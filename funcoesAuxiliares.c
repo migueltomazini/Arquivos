@@ -55,12 +55,16 @@ void preeche_vazio(FILE *arquivo, int tamanho) {
 }
 
 // Função para ler lixo do arquivo
-void ler_lixo(FILE *file){
+int ler_lixo(FILE *file) {
     char lixo;
+    int tam = -1;
     do {
         fread(&lixo, sizeof(char), 1, file); // Lê um caractere do arquivo
+        tam++;
     } while (lixo == '$'); // Continua lendo enquanto o caractere for '$'
     fseek(file, -1, SEEK_CUR); // Move o ponteiro de arquivo uma posição para trás
+
+    return tam;
 }
 
 // Função para atualizar a lista encadeada de registros removidos
