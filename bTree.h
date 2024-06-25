@@ -29,8 +29,8 @@
     };   
 
     void criarNo(NO_BTREE *no);
-    void inserirCabecalhoArvB (FILE *arquivo, BTREE *cabecalho);
-    void recuperarCabacalhoArvB (FILE *arquivo, BTREE *cabecalho);
+void inserirCabecalhoArvB (FILE *arquivo, BTREE *cabecalho, char status);
+    void recuperarCabecalhoArvB (FILE *arquivo, BTREE *cabecalho);
     void escreverNo(FILE * arquivo, long rrn, NO_BTREE *no);
     void recuperarNo(FILE * arquivo, long rrn, NO_BTREE *no);
     void inicializarArvoreB(BTREE *arvore, const char *nomeArquivo);
@@ -40,5 +40,7 @@
     void printRaiz(BTREE * arvore, FILE * arquivo);
     void inserirChave(BTREE *arvore, const char *nomeArquivo, int chave, long byteOffset);
     long buscarChave(BTREE *arvore, FILE *arquivo, long rrn, int chave);
+    
+
     
 #endif
