@@ -15,8 +15,7 @@ void criarNo(NO_BTREE *no) {
 }
 
 // Escreve o cabeçalho da árvore B no início do arquivo.
-void inserirCabecalhoArvB (FILE *arquivo, BTREE *cabecalho, char status) {
-    cabecalho->status = status;
+void inserirCabecalhoArvB (FILE *arquivo, BTREE *cabecalho) {
     fseek(arquivo, 0, SEEK_SET);
     fwrite(&(cabecalho->status), sizeof(char), 1, arquivo);
     fwrite(&(cabecalho->noRaiz), sizeof(int), 1, arquivo);
@@ -77,7 +76,7 @@ void inicializarArvoreB(BTREE *arvore, const char *nomeArquivo) {
     // for (int i = 0; i < 47; i++)
     //     arvore->lixo[i] = '$';
 
-    inserirCabecalhoArvB(arquivo, arvore, arvore->status);
+    inserirCabecalhoArvB(arquivo, arvore);
     fclose(arquivo);
 }
 
@@ -117,7 +116,7 @@ void dividirNo(int chave, long byteOffset, NO_BTREE *no, int *chavePromovida, lo
 
     // Alocação dos devidos valores no novo nó
     novoNo->alturaNo = no->alturaNo;
-    novoNo->nroChaves = (meio + 1);
+    novoNo->nroChaves = meio + 1;
     for (int j = 0; j < novoNo->nroChaves; j++) {
         novoNo->chaves[j] = chavesAux[meio + 1 + j];
         novoNo->byteOffset[j] = byteOffsetAux[meio + 1 + j];
@@ -256,8 +255,8 @@ void inserirChave(BTREE *arvore, const char *nomeArquivo, int chave, long byteOf
     }
 
     arvore->nroChaves++;
-  
-    inserirCabecalhoArvB(arquivo, arvore, '1');
+    arvore->status = '1';
+    inserirCabecalhoArvB(arquivo, arvore);
     printRaiz(arvore, arquivo);
     fclose(arquivo);
 }

@@ -29,7 +29,7 @@
     };   
 
     void criarNo(NO_BTREE *no);
-void inserirCabecalhoArvB (FILE *arquivo, BTREE *cabecalho, char status);
+    void inserirCabecalhoArvB (FILE *arquivo, BTREE *cabecalho);
     void recuperarCabecalhoArvB (FILE *arquivo, BTREE *cabecalho);
     void escreverNo(FILE * arquivo, long rrn, NO_BTREE *no);
     void recuperarNo(FILE * arquivo, long rrn, NO_BTREE *no);
