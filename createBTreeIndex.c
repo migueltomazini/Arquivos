@@ -38,16 +38,15 @@ void createBTreeIndex(char *nomeArquivo, char *nomeIndice) {
     REGISTRO *registro = NULL;
     alocarRegistro(&registro, maxNomeJog, maxNacionalidade, maxNomeClube);
     
-    int bytOffset = TAM_CABECALHO;
-    fseek(arquivoDados, bytOffset, SEEK_SET);
+    int byteOffset = TAM_CABECALHO;
+    fseek(arquivoDados, byteOffset, SEEK_SET);
     
     while (!feof(arquivoDados)) {
-        recuperarRegistro(&registro, arquivoDados, bytOffset, &maxNomeJog, &maxNacionalidade, &maxNomeClube);
+        recuperarRegistro(&registro, arquivoDados, byteOffset, &maxNomeJog, &maxNacionalidade, &maxNomeClube);
         if (registro->removido == '0')
-            inserirChave(&arvore, nomeIndice, registro->id, bytOffset);
-        bytOffset += registro->tamanhoRegistro;
-        //bytOffset += ler_lixo(arquivoDados);
-        printf("%d", bytOffset);
+            inserirChave(&arvore, nomeIndice, registro->id, byteOffset);
+        byteOffset += registro->tamanhoRegistro;
+        byteOffset += ler_lixo(arquivoDados);
     }
 
     fseek(arquivoIndice, 0, SEEK_SET); // Posiciona o ponteiro no início do arquivo de índice

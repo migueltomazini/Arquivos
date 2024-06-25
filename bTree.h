@@ -24,7 +24,7 @@
         int nroChaves;              // Armazena o número de chaves no nó
         int chaves[MAX_CHAVES];     // Armazena a chave primária
         long byteOffset[MAX_CHAVES];// Armazena o byteffset do registro no arquivo de dados
-        int ponteiroNo[MAX_CHAVES]; // Vetor para armazenar o RRN dos nós apontados por esse
+        int ponteiroNo[ORDEM]; // Vetor para armazenar o RRN dos nós apontados por esse
         long rrn;
     };   
 

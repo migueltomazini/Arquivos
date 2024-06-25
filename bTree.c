@@ -10,6 +10,7 @@ void criarNo(NO_BTREE *no) {
         no->byteOffset[i] = -1;
         no->ponteiroNo[i] = -1;
     }
+    no->ponteiroNo[ORDEM - 1] = -1;
     no->rrn = -1;
 }
 
@@ -20,6 +21,8 @@ void inserirCabecalhoArvB (FILE *arquivo, BTREE *cabecalho) {
     fwrite(&(cabecalho->noRaiz), sizeof(int), 1, arquivo);
     fwrite(&(cabecalho->proxRRN), sizeof(int), 1, arquivo);
     fwrite(&(cabecalho->nroChaves), sizeof(int), 1, arquivo);
+    for (int i = 0; i < 47; i++)
+        fputc('$', arquivo);
 }
 
 // Lê o cabeçalho da árvore B a partir do arquivo e retorna um ponteiro para ele.
@@ -40,7 +43,8 @@ void escreverNo(FILE * arquivo, long rrn, NO_BTREE *no) {
         fwrite(&(no->chaves[i]), sizeof(int), 1, arquivo);
         fwrite(&(no->byteOffset[i]), sizeof(long), 1, arquivo);
     }
-    fwrite(no->ponteiroNo, sizeof(int), ORDEM, arquivo);
+    for (int i = 0; i < ORDEM; i++)
+        fwrite(&(no->ponteiroNo[i]), sizeof(int), 1, arquivo);
 }
 
 // Lê um nó da árvore B a partir de uma posição específica no arquivo.
@@ -83,39 +87,42 @@ void dividirNo(int chave, long byteOffset, NO_BTREE *no, int *chavePromovida, lo
     // Vetores para armazenar os valores contidos no nó de forma temporária, para permitir a modificação
     int chavesAux[MAX_CHAVES + 1];
     long byteOffsetAux[MAX_CHAVES + 1];
-    int descendentesAux[MAX_CHAVES + 1];
+    int ponteirosAux[MAX_CHAVES + 1];
 
     // Copia as chaves e os byte offsets para arrays temporários
     for (int i = 0; i < MAX_CHAVES; i++) {
         chavesAux[i] = no->chaves[i];
         byteOffsetAux[i] = no->byteOffset[i];
-        descendentesAux[i] = no->ponteiroNo[i];
+        ponteirosAux[i] = no->ponteiroNo[i];
     }
-    descendentesAux[no->nroChaves] = no->ponteiroNo[MAX_CHAVES - 1];
-    descendentesAux[MAX_CHAVES] = *descendenteDireita;
+    // ponteirosAux[no->nroChaves] = no->ponteiroNo[MAX_CHAVES - 1];
+    // ponteirosAux[MAX_CHAVES] = *descendenteDireita;
+    ponteirosAux[ORDEM - 1] = no->ponteiroNo[ORDEM - 1];
 
     // Insere a nova chave na posição correta nos arrays temporários
     for (i = no->nroChaves - 1; i >= 0 && chave < chavesAux[i]; i--) {
         chavesAux[i + 1] = chavesAux[i];
         byteOffsetAux[i + 1] = byteOffsetAux[i];
+        ponteirosAux[i + 2] = ponteirosAux[i + 1];
     }
     chavesAux[i + 1] = chave;
     byteOffsetAux[i + 1] = byteOffset;
+    ponteirosAux[i + 2] = *descendenteDireita;
 
     // Definir a chave que será promovida
-    int meio = ORDEM / 2;
+    int meio = (ORDEM / 2) - 1;
     *chavePromovida = chavesAux[meio];
     *byteOffsetPromovido = byteOffsetAux[meio];
 
     // Alocação dos devidos valores no novo nó
     novoNo->alturaNo = no->alturaNo;
-    novoNo->nroChaves = meio - 1;
+    novoNo->nroChaves = (meio + 1);
     for (int j = 0; j < novoNo->nroChaves; j++) {
         novoNo->chaves[j] = chavesAux[meio + 1 + j];
         novoNo->byteOffset[j] = byteOffsetAux[meio + 1 + j];
-        novoNo->ponteiroNo[j] = descendentesAux[meio + 1 + j];
+        novoNo->ponteiroNo[j] = ponteirosAux[meio + 1 + j];
     }
-    novoNo->ponteiroNo[novoNo->nroChaves] = descendentesAux[MAX_CHAVES];
+    novoNo->ponteiroNo[novoNo->nroChaves] = ponteirosAux[MAX_CHAVES];
 
     // Limpa o restante do nó original
     for (int j = meio; j < MAX_CHAVES; j++) {
@@ -123,16 +130,16 @@ void dividirNo(int chave, long byteOffset, NO_BTREE *no, int *chavePromovida, lo
         no->byteOffset[j] = -1;
         no->ponteiroNo[j] = -1;
     }
-    no->ponteiroNo[MAX_CHAVES - 1] = -1;
+    no->ponteiroNo[ORDEM - 1] = -1;
 
-    // Alocação dos devidos valores no nó já existente
+    // Alocação dos devidos valores no nó original
     no->nroChaves = meio;
     for (int j = 0; j < meio; j++) {
         no->chaves[j] = chavesAux[j];
         no->byteOffset[j] = byteOffsetAux[j];
-        no->ponteiroNo[j] = descendentesAux[j];
+        no->ponteiroNo[j] = ponteirosAux[j];
     }
-    no->ponteiroNo[meio] = descendentesAux[meio];
+    no->ponteiroNo[meio] = ponteirosAux[meio];
 }
 
 // Função responsável por inserir chaves de forma recursiva
@@ -228,8 +235,6 @@ void inserirChave(BTREE *arvore, const char *nomeArquivo, int chave, long byteOf
         novoNo.nroChaves = 1;
         novoNo.chaves[0] = chavePromovida;
         novoNo.byteOffset[0] = byteOffsetPromovido;
-        // novoNo.ponteiroNo[0] = -1;
-        // novoNo.ponteiroNo[1] = -1;
         novoNo.rrn = arvore->proxRRN++;
         arvore->noRaiz = novoNo.rrn;
         escreverNo(arquivo, novoNo.rrn, &novoNo);
@@ -288,7 +293,7 @@ void printRaiz(BTREE * arvore, FILE * arquivo) {
     printf("%d\n", no.ponteiroNo[MAX_CHAVES - 1]);
     printf("-------------------------\n");
 
-
+    
     if(no.ponteiroNo[0] == 0){
         printDescendente(arvore, 0, arquivo);
     }
