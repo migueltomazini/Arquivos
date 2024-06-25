@@ -67,6 +67,18 @@ int main() {
         createBTreeIndex(nomeArquivoBin, nomeIndice); // Chama a função para criar o índice
         binarioNaTela(nomeIndice); // Exibe o conteúdo do índice na tela
         break;
+    case 8:
+        scanf(" %s", nomeArquivoBin); // Recebe o nome do arquivo
+        scanf(" %s", nomeIndice); // Recebe o nome do índice
+        scanf("%d", &nroRepeticoes); // Recebe o numero de remoções
+        selectFromBTree(nomeArquivoBin, nomeIndice, nroRepeticoes); // Chama a função para realizar a impressão
+        break;
+    case 9: 
+        scanf(" %s", nomeArquivoBin); // Recebe o nome do arquivo
+        scanf(" %s", nomeIndice); // Recebe o nome do índice
+        scanf("%d", &nroRepeticoes); // Recebe o numero de remoções
+        selectwhereBTree(nomeArquivoBin, nomeIndice, nroRepeticoes); // Chama a função para realizar a impressão
+        break;
     default:
         break;
     }

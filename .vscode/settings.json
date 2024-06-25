@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "funcoesauxiliares.h": "c",
+        "funcoes.h": "c",
+        "selectwherebtree": "c",
+        "btree.h": "c"
+    }
+}

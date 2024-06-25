@@ -15,7 +15,8 @@ void criarNo(NO_BTREE *no) {
 }
 
 // Escreve o cabeçalho da árvore B no início do arquivo.
-void inserirCabecalhoArvB (FILE *arquivo, BTREE *cabecalho) {
+void inserirCabecalhoArvB (FILE *arquivo, BTREE *cabecalho, char status) {
+    cabecalho->status = status;
     fseek(arquivo, 0, SEEK_SET);
     fwrite(&(cabecalho->status), sizeof(char), 1, arquivo);
     fwrite(&(cabecalho->noRaiz), sizeof(int), 1, arquivo);
@@ -26,7 +27,7 @@ void inserirCabecalhoArvB (FILE *arquivo, BTREE *cabecalho) {
 }
 
 // Lê o cabeçalho da árvore B a partir do arquivo e retorna um ponteiro para ele.
-void recuperarCabacalhoArvB (FILE *arquivo, BTREE *cabecalho) {
+void recuperarCabecalhoArvB (FILE *arquivo, BTREE *cabecalho) {
     fseek(arquivo, 0, SEEK_SET);
     fread(&(cabecalho->status), sizeof(char), 1, arquivo);
     fread(&(cabecalho->noRaiz), sizeof(int), 1, arquivo);
@@ -76,7 +77,7 @@ void inicializarArvoreB(BTREE *arvore, const char *nomeArquivo) {
     // for (int i = 0; i < 47; i++)
     //     arvore->lixo[i] = '$';
 
-    inserirCabecalhoArvB(arquivo, arvore);
+    inserirCabecalhoArvB(arquivo, arvore, arvore->status);
     fclose(arquivo);
 }
 
@@ -218,7 +219,7 @@ void inserirChave(BTREE *arvore, const char *nomeArquivo, int chave, long byteOf
     // if (testarArquivo(arquivo) == 1)
     //     exit(1); 
 
-    recuperarCabacalhoArvB(arquivo, arvore);
+    recuperarCabecalhoArvB(arquivo, arvore);
     arvore->status = '0';
     fseek(arquivo, 0, SEEK_SET);
     fwrite(&arvore->status, sizeof(char), 1, arquivo);
@@ -255,8 +256,8 @@ void inserirChave(BTREE *arvore, const char *nomeArquivo, int chave, long byteOf
     }
 
     arvore->nroChaves++;
-    arvore->status = '1';
-    inserirCabecalhoArvB(arquivo, arvore);
+  
+    inserirCabecalhoArvB(arquivo, arvore, '1');
     printRaiz(arvore, arquivo);
     fclose(arquivo);
 }

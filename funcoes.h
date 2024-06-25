@@ -5,6 +5,7 @@
     #include <stdlib.h>
     #include <string.h>
     #include <ctype.h>
+    #include "bTree.h"
 
     #define TAM_CABECALHO 25 // Define o tamanho padrão do cabeçalho do arquivo binário
 
@@ -69,5 +70,8 @@
     void createBTreeIndex(char *nomeArquivo, char *nomeIndice);
     // Função para realizar n buscas a partir do ID, utilizando o arquivo de índice em árvore B (Funcionalidade 8)
     void selectFromId(char *nomeArquivo, char *nomeIndice, int nroBuscas);
+    void selectFromBTree (char* nomeArquivo, char* nomeIndice, int n);
+   void selectwhereBTree(char* nomeArquivo, char* nomeIndice, int n);
+   
     
 #endif // FUNCOES_H
