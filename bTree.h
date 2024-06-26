@@ -1,3 +1,14 @@
+/*
+Esse programa foi desenvolvido com o objetivo de implementar uma Árvore B para uso em um trabalho de manipulação de arquivos. 
+Programa desenvolvido a partir de uma atividade proposta na disciplina de Organização de Arquivos (SCC0215) ministrada por 
+Cristina Dutra de Aguiar.
+
+Autores:
+Isabela Beatriz Sousa Nunes Farias - 13823833
+Miguel Rodrigues Tomazini - 14599300
+(2024)
+*/
+
 #ifndef BTREE_H
     #define BTREE_H
 
@@ -24,23 +35,17 @@
         int nroChaves;              // Armazena o número de chaves no nó
         int chaves[MAX_CHAVES];     // Armazena a chave primária
         long byteOffset[MAX_CHAVES];// Armazena o byteffset do registro no arquivo de dados
-        int ponteiroNo[ORDEM]; // Vetor para armazenar o RRN dos nós apontados por esse
-        long rrn;
+        int ponteiroNo[ORDEM];      // Vetor para armazenar o RRN dos nós apontados por esse
+        long rrn;                   // Armazena o RRN do nó
     };   
 
-    void criarNo(NO_BTREE *no);
     void inserirCabecalhoArvB (FILE *arquivo, BTREE *cabecalho);
     void recuperarCabecalhoArvB (FILE *arquivo, BTREE *cabecalho);
+    void criarNo(NO_BTREE *no);
     void escreverNo(FILE * arquivo, long rrn, NO_BTREE *no);
     void recuperarNo(FILE * arquivo, long rrn, NO_BTREE *no);
     void inicializarArvoreB(BTREE *arvore, const char *nomeArquivo);
     void dividirNo(int chave, long byteOffset, NO_BTREE *no, int *chavePromovida, long *byteOffsetPromovido, int *descendenteDireita, NO_BTREE *novoNoDireita);
-    int inserirChaveRecursivo(FILE *arquivo, BTREE *arvore, int rrnAtual, int chave, long byteOffset, int *promoKey, long *promoOffset, int *promoRChild);
-    void printDescendente(BTREE * arvore, int rrn, FILE * arquivo);
-    void printRaiz(BTREE * arvore, FILE * arquivo);
     void inserirChave(BTREE *arvore, const char *nomeArquivo, int chave, long byteOffset);
-    long buscarChave(BTREE *arvore, FILE *arquivo, long rrn, int chave);
-    
-
-    
+    long buscarChave(BTREE *arvore, FILE *arquivo, long rrn, int chave);    
 #endif

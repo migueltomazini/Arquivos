@@ -41,6 +41,7 @@ void createBTreeIndex(char *nomeArquivo, char *nomeIndice) {
     int byteOffset = TAM_CABECALHO;
     fseek(arquivoDados, byteOffset, SEEK_SET);
     
+    // Atribuição das chaves na árvore B enquanto não chegar ao fim do arquivo de dados
     while (!feof(arquivoDados)) {
         recuperarRegistro(&registro, arquivoDados, byteOffset, &maxNomeJog, &maxNacionalidade, &maxNomeClube);
         if (registro->removido == '0')
