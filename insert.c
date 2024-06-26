@@ -38,6 +38,7 @@ void insertIntoAux(char *nomeArquivo, long int *byteOffset) {
     REGISTRO* registro = criar_registro(id, idade, nomeJogador, nacionalidade, nomeClube); // Cria um novo registro
     if (cabecalho.topo == -1) { // Se não há registros removidos
         fseek(nomearq, 0, SEEK_END); // Posiciona o ponteiro no final do arquivo
+         *byteOffset = ftell(nomearq); // Armazena a posição do byte offset
         inserirRegistro(registro, nomearq); // Insere o novo registro no final do arquivo
         cabecalho.prosByteOffset += registro->tamanhoRegistro; // Atualiza o próximo byte offset
         cabecalho.nroRegArq++; // Incrementa o número de registros
@@ -59,6 +60,7 @@ void insertIntoAux(char *nomeArquivo, long int *byteOffset) {
     if (anterior->prox == -1) { // Se só existe um registro removido
         if (registro->tamanhoRegistro <= anterior->tamanhoRegistro) { // Se o tamanho do novo registro é menor ou igual ao registro removido
             fseek(nomearq, (-1) * anterior->tamanhoRegistro, SEEK_CUR); // Posiciona o ponteiro no início do registro removido
+             *byteOffset = ftell(nomearq); // Armazena a posição do byte offset
             int tamaux = registro->tamanhoRegistro;
             registro->tamanhoRegistro = anterior->tamanhoRegistro; // Atualiza o tamanho do novo registro para ocupar o espaço do registro removido
             inserirRegistro(registro, nomearq); // Insere o novo registro no lugar do registro removido
@@ -73,6 +75,7 @@ void insertIntoAux(char *nomeArquivo, long int *byteOffset) {
             return;
         } else { // Se o tamanho do novo registro é maior que o registro removido
             fseek(nomearq, 0, SEEK_END); // Posiciona o ponteiro no final do arquivo
+             *byteOffset = ftell(nomearq); // Armazena a posição do byte offset
             inserirRegistro(registro, nomearq); // Insere o novo registro no final do arquivo
             cabecalho.prosByteOffset += registro->tamanhoRegistro; // Atualiza o próximo byte offset
             cabecalho.nroRegArq++; // Incrementa o número de registros
@@ -83,6 +86,7 @@ void insertIntoAux(char *nomeArquivo, long int *byteOffset) {
         }
     } else if (registro->tamanhoRegistro <= anterior->tamanhoRegistro) { // Se o novo registro deve ser inserido no topo
         fseek(nomearq, (-1) * anterior->tamanhoRegistro, SEEK_CUR); // Posiciona o ponteiro no início do registro removido
+         *byteOffset = ftell(nomearq); // Armazena a posição do byte offset
         int tamaux = registro->tamanhoRegistro;
         registro->tamanhoRegistro = anterior->tamanhoRegistro; // Atualiza o tamanho do novo registro para ocupar o espaço do registro removido
         inserirRegistro(registro, nomearq); // Insere o novo registro no lugar do registro removido
@@ -101,6 +105,7 @@ void insertIntoAux(char *nomeArquivo, long int *byteOffset) {
     long int aux_atual = anterior->prox; // Byte offset do próximo registro a ser processado
     while (aux_atual != -1) { // Percorre a lista de registros removidos
         fseek(nomearq, aux_atual, SEEK_SET); // Posiciona o ponteiro no próximo registro removido
+         *byteOffset = ftell(nomearq); // Armazena a posição do byte offset
         REGISTRO* atual = (REGISTRO*) malloc(sizeof(REGISTRO)); // Aloca memória para o registro atual
         ler_registro(atual, nomearq); // Lê o registro atual
         ler_lixo(nomearq); // Lê os espaços vazios após o registro atual
@@ -108,6 +113,7 @@ void insertIntoAux(char *nomeArquivo, long int *byteOffset) {
         if (registro->tamanhoRegistro <= atual->tamanhoRegistro) { // Se o novo registro deve ser inserido no lugar do registro atual
             anterior->prox = atual->prox; // Atualiza o ponteiro do registro anterior para pular o registro atual
             fseek(nomearq, (-1) * atual->tamanhoRegistro, SEEK_CUR); // Posiciona o ponteiro no início do registro atual
+             *byteOffset = ftell(nomearq); // Armazena a posição do byte offset
             int tamaux = registro->tamanhoRegistro;
             registro->tamanhoRegistro = atual->tamanhoRegistro; // Atualiza o tamanho do novo registro para ocupar o espaço do registro atual
             inserirRegistro(registro, nomearq); // Insere o novo registro no lugar do registro atual
@@ -131,6 +137,7 @@ void insertIntoAux(char *nomeArquivo, long int *byteOffset) {
 
     // Insere o novo registro no final do arquivo
     fseek(nomearq, 0, SEEK_END);
+     *byteOffset = ftell(nomearq); // Armazena a posição do byte offset
     inserirRegistro(registro, nomearq);
     cabecalho.nroRegArq++; // Incrementa o número de registros
     cabecalho.prosByteOffset += registro->tamanhoRegistro; // Atualiza o próximo byte offset
