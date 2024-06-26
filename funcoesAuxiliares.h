@@ -64,4 +64,7 @@ void alocarRegistro(REGISTRO **registro, int maxNomeJog, int maxNacionalidade, i
 // Função auxiliar responsável por desalocar a memória do registro
 void desalocarRegistro(REGISTRO **registro);
 
+void reinserir_cabecalho_ind(FILE *arquivo, CABECALHO_IND *cabecalho, char status);
+void ler_cabecalho_ind(FILE *arquivo, CABECALHO_IND *cabecalho);
+void insertIntoAux(char *nomeArquivo, long int *byteOffset);
 #endif // FUNCOESAUXILARES_H

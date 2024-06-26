@@ -16,6 +16,17 @@ void reinserir_cabecalho(FILE *arquivo, CABECALHO *cabecalho, char status) {
     fwrite(&cabecalho->nroRegRem, sizeof(int), 1, arquivo); // Escreve o número de registros removidos no arquivo
 }
 
+void reinserir_cabecalho_ind(FILE *arquivo, CABECALHO_IND *cabecalho, char status) {
+    cabecalho->status = status; // Atualiza o status do cabeçalho
+    fseek(arquivo, 0, SEEK_SET); // Posiciona o ponteiro do arquivo no início
+    fwrite(&cabecalho->status, sizeof(char), 1, arquivo); // Escreve o status no arquivo
+}
+
+void ler_cabecalho_ind(FILE *arquivo, CABECALHO_IND *cabecalho) {
+    fseek(arquivo, 0, SEEK_SET); // Posiciona o ponteiro do arquivo no início
+    fread(&cabecalho->status, sizeof(char), 1, arquivo); // Lê o status do arquivo
+}
+
 // Função para ler o cabeçalho do arquivo
 void ler_cabecalho(FILE *arquivo, CABECALHO *cabecalho) {
     fseek(arquivo, 0, SEEK_SET); // Posiciona o ponteiro do arquivo no início

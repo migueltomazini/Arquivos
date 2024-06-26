@@ -78,6 +78,14 @@ int main() {
         scanf("%d", &nroRepeticoes); // Recebe o numero de remoções
         selectwhereBTree(nomeArquivoBin, nomeIndice, nroRepeticoes); // Chama a função para realizar a impressão
         break;
+    case 10:
+        scanf(" %s", nomeArquivoBin); // Recebe o nome do arquivo
+        scanf(" %s", nomeIndice); // Recebe o nome do índice
+        scanf("%d", &nroRepeticoes); // Recebe o numero de remoções
+        insertbtree(nomeArquivoBin, nomeIndice, nroRepeticoes); // Chama a função para realizar a impressão
+        binarioNaTela(nomeArquivoBin);
+        binarioNaTela(nomeIndice);
+        break;
     default:
         break;
     }

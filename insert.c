@@ -2,7 +2,7 @@
 #include "funcoesAuxiliares.h" // Inclui o cabeçalho com as funções auxiliares
 
 // Função auxiliar para inserir um registro no arquivo
-void insertIntoAux(char *nomeArquivo) {
+void insertIntoAux(char *nomeArquivo, long int *byteOffset) {
     int id, idade; 
     char nomeJogador[30], nacionalidade[30], nomeClube[30], auxIdade[4];
 
@@ -20,7 +20,7 @@ void insertIntoAux(char *nomeArquivo) {
     // Abre o arquivo binário para leitura e escrita
     FILE* nomearq = fopen(nomeArquivo, "rb+");
     if (nomearq == NULL) { // Verifica se a abertura do arquivo falhou
-        printf("Falha no processamento do arquivo\n");
+        printf("Falha no processamento do arquivo.\n");
         exit(1);
     }
 
@@ -28,7 +28,7 @@ void insertIntoAux(char *nomeArquivo) {
     ler_cabecalho(nomearq, &cabecalho); // Lê o cabeçalho do arquivo
 
     if (cabecalho.status == '0') { // Verifica se o status do cabeçalho é inválido
-        printf("Falha no processamento do arquivo\n");
+        printf("Falha no processamento do arquivo.2\n");
         fclose(nomearq); // Fecha o arquivo
         exit(1);
     }
@@ -142,7 +142,7 @@ void insertIntoAux(char *nomeArquivo) {
 // Função principal para inserir múltiplos registros no arquivo
 void insertInto(char *nomeArquivo, char *nomeIndice, int nroAdicoes) {
     for (int i = 0; i < nroAdicoes; i++) {
-        insertIntoAux(nomeArquivo); // Insere cada registro utilizando a função auxiliar
+        insertIntoAux(nomeArquivo, NULL); // Insere cada registro utilizando a função auxiliar
     }
     createIndex(nomeArquivo, nomeIndice); // Recria o índice após as inserções
 }

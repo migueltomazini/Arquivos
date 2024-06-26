@@ -249,7 +249,7 @@ void inserirChave(BTREE *arvore, const char *nomeArquivo, int chave, long byteOf
     arvore->nroChaves++;
     arvore->status = '1';
     inserirCabecalhoArvB(arquivo, arvore);
-
+printf("123\n");
     fclose(arquivo);
 }
 
@@ -271,4 +271,5 @@ long buscarChave(BTREE *arvore, FILE *arquivo, long rrn, int chave) {
     // Descer um nível para procurar a chave
     else
         return buscarChave(arvore, arquivo, no.ponteiroNo[i], chave);
+    
 }

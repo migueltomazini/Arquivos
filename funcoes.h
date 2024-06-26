@@ -72,6 +72,7 @@
     void selectFromId(char *nomeArquivo, char *nomeIndice, int nroBuscas);
     void selectFromBTree (char* nomeArquivo, char* nomeIndice, int n);
    void selectwhereBTree(char* nomeArquivo, char* nomeIndice, int n);
+   void insertbtree (char *nomeArquivo, char *nomeIndice, int nroAdicoes);
    
     
 #endif // FUNCOES_H
