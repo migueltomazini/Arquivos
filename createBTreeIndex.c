@@ -6,7 +6,7 @@ void createBTreeIndex(char *nomeArquivo, char *nomeIndice) {
     FILE *arquivoDados = fopen(nomeArquivo, "rb"); // Abre o arquivo de dados para leitura binária
     if (arquivoDados == NULL) { // Verifica se a abertura do arquivo falhou
         printf("Falha no processamento do arquivo.\n"); // Imprime mensagem de erro
-        exit(1); // Encerra o programa com erro
+        exit(0);
     }
 
     CABECALHO cabecalho; // Declaração do cabeçalho do arquivo de dados
@@ -14,14 +14,14 @@ void createBTreeIndex(char *nomeArquivo, char *nomeIndice) {
     if (cabecalho.status == '0') { // Verifica se o status do cabeçalho é inválido
         printf("Falha no processamento do arquivo.\n"); // Imprime mensagem de erro
         fclose(arquivoDados); // Fecha o arquivo de dados
-        exit(0); // Encerra o programa com erro
+        exit(0);
     }
 
     FILE *arquivoIndice = fopen(nomeIndice, "wb"); // Abre o arquivo de índice para escrita binária
     if (arquivoIndice == NULL) { // Verifica se a abertura do arquivo falhou
         printf("Falha no processamento do arquivo.\n"); // Imprime mensagem de erro
         fclose(arquivoDados); // Fecha o arquivo de dados
-        exit(1); // Encerra o programa com erro
+        exit(0);
     }
 
     // Tamanhos máximos iniciais dos campos de texto
